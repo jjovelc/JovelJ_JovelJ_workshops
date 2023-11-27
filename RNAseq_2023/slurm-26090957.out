@@ -1,0 +1,323 @@
+Job started on: Mon Nov 27 12:23:33 MST 2023
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP1A_1M_1.fq.gz
+                             GRP1A_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 721,510 reads pseudoaligned
+[quant] estimated average fragment length: 303.279
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,306 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP1B_1M_1.fq.gz
+                             GRP1B_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 743,564 reads pseudoaligned
+[quant] estimated average fragment length: 297.179
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,472 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP1C_1M_1.fq.gz
+                             GRP1C_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 734,120 reads pseudoaligned
+[quant] estimated average fragment length: 297.294
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,216 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP1D_1M_1.fq.gz
+                             GRP1D_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 767,466 reads pseudoaligned
+[quant] estimated average fragment length: 288.506
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,358 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP1E_1M_1.fq.gz
+                             GRP1E_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 732,824 reads pseudoaligned
+[quant] estimated average fragment length: 300.774
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,156 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP2A_1M_1.fq.gz
+                             GRP2A_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 799,137 reads pseudoaligned
+[quant] estimated average fragment length: 293.299
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,278 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP2B_1M_1.fq.gz
+                             GRP2B_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 788,733 reads pseudoaligned
+[quant] estimated average fragment length: 292.61
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,154 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP2C_1M_1.fq.gz
+                             GRP2C_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 767,042 reads pseudoaligned
+[quant] estimated average fragment length: 305.912
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,209 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP2D_1M_1.fq.gz
+                             GRP2D_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 787,366 reads pseudoaligned
+[quant] estimated average fragment length: 301.466
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,237 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP2E_1M_1.fq.gz
+                             GRP2E_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 782,069 reads pseudoaligned
+[quant] estimated average fragment length: 302.944
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,196 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP3A_1M_1.fq.gz
+                             GRP3A_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 722,391 reads pseudoaligned
+[quant] estimated average fragment length: 301.033
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,305 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP3B_1M_1.fq.gz
+                             GRP3B_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 733,602 reads pseudoaligned
+[quant] estimated average fragment length: 305.188
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,215 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP3C_1M_1.fq.gz
+                             GRP3C_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 738,059 reads pseudoaligned
+[quant] estimated average fragment length: 302.393
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,318 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP3D_1M_1.fq.gz
+                             GRP3D_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 731,825 reads pseudoaligned
+[quant] estimated average fragment length: 295.977
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,250 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP3E_1M_1.fq.gz
+                             GRP3E_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 728,084 reads pseudoaligned
+[quant] estimated average fragment length: 286.114
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,267 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP4A_1M_1.fq.gz
+                             GRP4A_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 809,276 reads pseudoaligned
+[quant] estimated average fragment length: 297.525
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,267 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP4B_1M_1.fq.gz
+                             GRP4B_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 791,813 reads pseudoaligned
+[quant] estimated average fragment length: 302.355
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,202 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP4C_1M_1.fq.gz
+                             GRP4C_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 771,905 reads pseudoaligned
+[quant] estimated average fragment length: 294.171
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 2,146 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP4D_1M_1.fq.gz
+                             GRP4D_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 762,100 reads pseudoaligned
+[quant] estimated average fragment length: 295.98
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,433 rounds
+
+
+[quant] fragment length distribution will be estimated from the data
+[index] k-mer length: 31
+[index] number of targets: 207,249
+[index] number of k-mers: 116,726,086
+[index] number of equivalence classes: 848,752
+[quant] running in paired-end mode
+[quant] will process pair 1: GRP4E_1M_1.fq.gz
+                             GRP4E_1M_2.fq.gz
+[quant] finding pseudoalignments for the reads ... done
+[quant] learning parameters for sequence specific bias
+[quant] processed 1,000,000 reads, 787,912 reads pseudoaligned
+[quant] estimated average fragment length: 302.291
+[   em] quantifying the abundances ... done
+[   em] the Expectation-Maximization algorithm ran for 1,539 rounds
+
+Job ended on: Mon Nov 27 12:45:23 MST 2023
+Job duration: 0 hours, 21 minutes, 50 seconds
