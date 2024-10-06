@@ -1,5 +1,5 @@
 # Courses
-Here is the materials associated with courses dictated at UofC or elsewhere<br>
+Here are the materials associated with courses dictated at UofC or elsewhere<br>
 
 All code developed or shared in the courses should be available in the corresponding repo.<br>
 
