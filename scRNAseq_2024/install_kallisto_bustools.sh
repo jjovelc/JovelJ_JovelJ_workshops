@@ -2,6 +2,19 @@
 
 SOFTWARE=$1
 
+# Function to display help/usage information
+show_help() {
+    echo "Usage: ./install_software.sh [SOFTWARE]"
+    echo "Install selected bioinformatics tools."
+    echo ""
+    echo "Options:"
+    echo "  bustools       Install Bustools"
+    echo "  kallisto       Install Kallisto"
+    echo "  kb             Install kb-python"
+    echo "  all            Install all tools (Bustools, Kallisto, kb-python)"
+    echo "  -h             Show this help message and exit"
+}
+
 # Function to install Bustools
 install_bustools() {
     if ! command -v bustools &> /dev/null; then
@@ -42,7 +55,6 @@ install_kallisto() {
     fi
 }
 
-
 # Function to install kb-python
 install_kb() {
     if ! command -v kb &> /dev/null; then
@@ -52,6 +64,12 @@ install_kb() {
         echo "kb is already installed in your system"
     fi
 }
+
+# Check if the -h flag is passed
+if [[ "$SOFTWARE" == "-h" ]]; then
+    show_help
+    exit 0
+fi
 
 # Decision logic based on the SOFTWARE variable
 # Convert SOFTWARE value to lowercase
@@ -73,7 +91,7 @@ case $software_lower in
         install_kb
         ;;
     *)
-        echo "Invalid option. Please specify 'bustools', 'kallisto', or 'all'."
+        echo "Invalid option. Please specify 'bustools', 'kallisto', 'kb', or 'all'."
+        echo "Use '-h' for help."
         ;;
 esac
-
