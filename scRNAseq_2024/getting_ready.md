@@ -11,9 +11,7 @@ Mamba is a package management system that is analogous to Conda, just faster. Th
 1. Download installer from:
 
 https://github.com/conda-forge/miniforge/releases
-
 ```bash
-
 wget https://github.com/conda-forge/miniforge/releases/download/24.7.1-2/Mambaforge-24.7.1-2-Linux-x86_64.sh
 
 ```
@@ -21,9 +19,7 @@ wget https://github.com/conda-forge/miniforge/releases/download/24.7.1-2/Mambafo
 2. Run the executable to install Mamba:
 
 ```bash
-
 bash Mambaforge-24.7.1-2-Linux-x86_64.sh
-
 ```
 
 Follow instructions and allow mamba to modify your bashrc (yes in last question).
@@ -31,33 +27,25 @@ Follow instructions and allow mamba to modify your bashrc (yes in last question)
 3. Type command 'mamba' if the command is not available, type que following command:
 
 ```bash
-
 echo 'export PATH=/work/vetmed_data/mamba/bin/:$PATH' >> ~/.bashrc 
-
 ```
 
 4. source .bashrc:
 
 ```bash
-
 source ~/.bashrc
-
 ```
 
 5. Initialize mamba:
 
 ```bash
-
 mamba init
-
 ```
 
 6. Source .bashrc again
 
 ```bash
-
 source ~/.bashrc
-
 ```
 
 
@@ -66,21 +54,17 @@ source ~/.bashrc
 ### 1. Create a new mamba environment to host kallisto and bus tools:
 
 ```bash
-
 mamba create -n kallisto_bus python=3.12 -y
-
 ``` 
 
 ### 2. Install kallisto
 
 ```bash
-
 # Activate environment
 mamba activate kallisto_bus
 
 # Install kallisto
 mamba install -c bioconda kallisto -y
-
 ```
 
 Try kallisto. If properly installed, you should see the following after typing 'kallisto':
@@ -88,7 +72,7 @@ Try kallisto. If properly installed, you should see the following after typing '
 ---
 kallisto 0.51.1
 
-Usage: kallisto <CMD> [arguments] ...
+Usage: kallisto `<CMD>` [arguments] ...
 
 Where `<CMD>` can be one of:
 
@@ -101,15 +85,13 @@ Where `<CMD>` can be one of:
     version       Prints version information
     cite          Prints citation information
 
-Running kallisto `<CMD>` without arguments prints usage information for `<CMD>`
+`Running kallisto `<CMD>` without arguments prints usage information for `<CMD>`
 ---
 
 ### 3. Install kb-python tools
 
 ```bash
-
 pip install kb-python
-
 ```
 
 Try kb-python. If properly installed you should see the following after typing kb:
@@ -128,7 +110,7 @@ positional arguments:
 
 options:
   -h, --help  Show this help message and exit
-  --list      Display list of supported single-cell technologies
+  `--list     Display list of supported single-cell technologies
 ---
 
 ## Installation of R packages
