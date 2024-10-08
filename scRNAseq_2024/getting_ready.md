@@ -79,7 +79,7 @@ mamba create -n kallisto_bus python=3.12 -y
 mamba activate kallisto_bus
 
 # Install kallisto
-mamba install -c bioconda kallisto
+mamba install -c bioconda kallisto -y
 
 ```
 
