@@ -11,6 +11,7 @@ Mamba is a package management system that is analogous to Conda, just faster. Th
 1. Download installer from:
 
 https://github.com/conda-forge/miniforge/releases
+
 ```bash
 wget https://github.com/conda-forge/miniforge/releases/download/24.7.1-2/Mambaforge-24.7.1-2-Linux-x86_64.sh
 
@@ -85,7 +86,7 @@ Where `<CMD>` can be one of:
     version       Prints version information
     cite          Prints citation information
 
-`Running kallisto `<CMD>` without arguments prints usage information for `<CMD>`
+    Running kallisto `<CMD>` without arguments prints usage information for `<CMD>`
 ---
 
 ### 3. Install kb-python tools
@@ -110,7 +111,7 @@ positional arguments:
 
 options:
   -h, --help  Show this help message and exit
-  `--list     Display list of supported single-cell technologies
+  --list     Display list of supported single-cell technologies
 ---
 
 ## Installation of R packages
