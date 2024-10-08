@@ -2,7 +2,7 @@
 
 This document guides you through the installation of all software required for the scRNAseq data analysis course
 
-## Installation of mamba.
+## Installation of mamba (in ARC server)
 
 NOTE: If you already have Conda or Mamba, skip this step.
 
@@ -50,7 +50,7 @@ source ~/.bashrc
 ```
 
 
-## Installation of Kallisto-Bus
+## Installation of Kallisto-Bus (in ARC server)
 
 ### 1. Create a new mamba environment to host kallisto and bus tools:
 
@@ -91,7 +91,7 @@ Where <CMD> can be one of:
 ```
 ---
 
-### 3. Install kb-python tools
+### 3. Install kb-python tools (in ARC server)
 
 ```bash
 pip install kb-python
@@ -118,7 +118,12 @@ options:
 ```
 ---
 
-## Installation of R packages
+## Installation of R packages (in your laptop)
+
+### 0. Install R and Rstudio
+
+R and Rstudio installers can be downloaded from [R & Rstudio] (https://posit.co/download/rstudio-desktop/)
+
 
 ### 1. Install remotes
 
