@@ -88,9 +88,9 @@ Try kallisto. If properly installed, you should see the following after typing '
 ---
 kallisto 0.51.1
 
-Usage: kallisto <CMD> [arguments] ..
+Usage: kallisto <CMD> [arguments] ...
 
-Where <CMD> can be one of:
+Where `<CMD>` can be one of:
 
     index         Builds a kallisto index 
     quant         Runs the quantification algorithm 
@@ -101,7 +101,7 @@ Where <CMD> can be one of:
     version       Prints version information
     cite          Prints citation information
 
-Running kallisto <CMD> without arguments prints usage information for <CMD>
+Running kallisto `<CMD>` without arguments prints usage information for `<CMD>`
 ---
 
 ### 3. Install kb-python tools
@@ -115,12 +115,12 @@ pip install kb-python
 Try kb-python. If properly installed you should see the following after typing kb:
 
 ---
-usage: kb [-h] [--list] <CMD> ...
+usage: kb [-h] [--list] `<CMD>` ...
 
 kb_python 0.28.2
 
 positional arguments:
-  <CMD>
+  `<CMD>`
     info      Display package and citation information
     compile   Compile `kallisto` and `bustools` binaries from source
     ref       Build a kallisto index and transcript-to-gene mapping
@@ -170,5 +170,5 @@ install.packages("tidyverse")
 
 ```
 
-NOTE: If you run in any trouble, just contact me (juan.jovel@ucalgary.ca).
+NOTE: If you run into any trouble, just contact me (juan.jovel@ucalgary.ca).
 
