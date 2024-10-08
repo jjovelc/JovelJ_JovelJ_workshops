@@ -98,20 +98,21 @@ pip install kb-python
 Try kb-python. If properly installed you should see the following after typing kb:
 
 ---
-usage: kb [-h] [--list] `<CMD>` ...
+usage: kb [-h] [--list] <CMD> ...
 
 kb_python 0.28.2
 
 positional arguments:
-  `<CMD>`
+  <CMD>
     info      Display package and citation information
-    compile   Compile `kallisto` and `bustools` binaries from source
+    compile   Compile kallisto and bustools binaries from source
     ref       Build a kallisto index and transcript-to-gene mapping
     count     Generate count matrices from a set of single-cell FASTQ files
 
 options:
   -h, --help  Show this help message and exit
-  --list     Display list of supported single-cell technologies
+  --list      Display list of supported single-cell technologies
+
 ---
 
 ## Installation of R packages
