@@ -2,28 +2,33 @@
 
 This document guides you through the installation of all software required for the scRNAseq data analysis course
 
-## Installation of mamba (in ARC server)
+## Installation of Mamba (in ARC server)
 
-NOTE: If you already have Conda or Mamba, skip this step.
+**Note:** If you already have Conda or Mamba installed, you can skip this step.
 
-Mamba is a package management system that is analogous to Conda, just faster. The reason is, Conda is writen in Python, while Mamba is writen in C++. 
+Mamba is a package management system similar to Conda, but faster. The primary difference is that Conda is written in Python, whereas Mamba is written in C++, making it more efficient for certain tasks.
 
-1. Download installer from:
+### Steps for Installation:
 
-https://github.com/conda-forge/miniforge/releases
+1. **Download the installer** from the official Mamba repository:
+
+   [Download Mambaforge](https://github.com/conda-forge/miniforge/releases)
+
+   Alternatively, you can use `wget` to download the installer directly:
+
 
 ```bash
 wget https://github.com/conda-forge/miniforge/releases/download/24.7.1-2/Mambaforge-24.7.1-2-Linux-x86_64.sh
 
 ```
 
-2. Run the executable to install Mamba:
+2. Run the installer:
 
 ```bash
 bash Mambaforge-24.7.1-2-Linux-x86_64.sh
 ```
 
-Follow instructions and allow mamba to modify your bashrc (yes in last question).
+Follow prompts and allow mamba to modify your .bashrc file (yes in last question).
 
 3. Type command 'mamba' if the command is not available, type que following command:
 
@@ -48,6 +53,9 @@ mamba init
 ```bash
 source ~/.bashrc
 ```
+
+After completing these steps, Mamba should be installed and ready to use. You can verify the installation by typing mamba in the terminal.
+
 
 
 ## Installation of Kallisto-Bus (in ARC server)
