@@ -71,11 +71,12 @@ mamba install -c bioconda kallisto -y
 Try kallisto. If properly installed, you should see the following after typing 'kallisto':
 
 ---
+```
 kallisto 0.51.1
 
 Usage: kallisto `<CMD>` [arguments] ...
 
-Where `<CMD>` can be one of:
+Where <CMD> can be one of:
 
     index         Builds a kallisto index 
     quant         Runs the quantification algorithm 
@@ -86,7 +87,8 @@ Where `<CMD>` can be one of:
     version       Prints version information
     cite          Prints citation information
 
-    Running kallisto `<CMD>` without arguments prints usage information for `<CMD>`
+    Running kallisto <CMD> without arguments prints usage information for <CMD>
+```
 ---
 
 ### 3. Install kb-python tools
