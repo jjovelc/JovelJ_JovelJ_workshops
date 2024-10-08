@@ -98,6 +98,7 @@ pip install kb-python
 Try kb-python. If properly installed you should see the following after typing kb:
 
 ---
+```
 usage: kb [-h] [--list] <CMD> ...
 
 kb_python 0.28.2
@@ -112,7 +113,7 @@ positional arguments:
 options:
   -h, --help  Show this help message and exit
   --list      Display list of supported single-cell technologies
-
+```
 ---
 
 ## Installation of R packages
