@@ -172,3 +172,18 @@ install.packages("tidyverse")
 
 NOTE: If you run into any trouble, just contact me (juan.jovel@ucalgary.ca).
 
+### 4. Install DoubletFinder
+
+```bash
+
+install.packages("DoubletFinder")
+
+```
+
+### 5. Install EnhacedVolcano
+
+```bash
+
+install.packages("EnhancedVolcano")
+
+```
