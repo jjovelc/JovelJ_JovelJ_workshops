@@ -33,7 +33,7 @@ Follow prompts and allow mamba to modify your .bashrc file (yes in last question
 3. Type command 'mamba' if the command is not available, type que following command:
 
 ```bash
-echo 'export PATH=/work/vetmed_data/mamba/bin/:$PATH' >> ~/.bashrc 
+echo 'export PATH=/home/<your-user-name>/mambarforge:$PATH' >> ~/.bashrc 
 ```
 
 4. source .bashrc:
@@ -58,73 +58,64 @@ After completing these steps, Mamba should be installed and ready to use. You ca
 
 
 
-## Installation of Kallisto-Bus (in ARC server)
-
-### 1. Create a new mamba environment to host kallisto and bus tools:
+### Installation of salmon
 
 ```bash
-mamba create -n kallisto_bus python=3.12 -y
+mamba create -n salmon -c bioconda salmon -y
 ``` 
 
-### 2. Install kallisto
+If correctly installed, you can activate the environment and test salmon:
 
 ```bash
-# Activate environment
-mamba activate kallisto_bus
+mamba activate salmon
 
-# Install kallisto
-mamba install -c bioconda kallisto -y
+salmon
+
+salmon v1.10.3
+
+'Usage:  salmon -h|--help or 
+        salmon -v|--version or 
+        salmon -c|--cite or 
+        salmon [--no-version-check] <COMMAND> [-h | options]
+
+'Commands:
+     'index      : create a salmon index
+     'quant      : quantify a sample
+     'alevin     : single cell analysis
+     'swim       : perform super-secret operation
+     'quantmerge : merge multiple quantifications into a single file
 ```
 
-Try kallisto. If properly installed, you should see the following after typing 'kallisto':
+You can also inspect the help of the alevin module, which is the one we will use for quantificaiton of our scRNAseq libraries.
 
----
-```
-kallisto 0.51.1
-
-Usage: kallisto `<CMD>` [arguments] ...
-
-Where <CMD> can be one of:
-
-    index         Builds a kallisto index 
-    quant         Runs the quantification algorithm 
-    quant-tcc     Runs quantification on transcript-compatibility counts
-    bus           Generate BUS files for single-cell data 
-    h5dump        Converts HDF5-formatted results to plaintext
-    inspect       Inspects and gives information about an index
-    version       Prints version information
-    cite          Prints citation information
-
-    Running kallisto <CMD> without arguments prints usage information for <CMD>
-```
----
-
-### 3. Install kb-python tools (in ARC server)
 
 ```bash
-pip install kb-python
+salmon alevin -h
+
+Version Server Response: Not Found
+
+alevin
+==========
+salmon-based processing of single-cell RNA-seq data.
+
+'alevin options:
+
+
+'mapping input options:
+  -l [ --libType ] arg                  Format string describing the library 
+                                        type
+  -i [ --index ] arg                    salmon index
+  -r [ --unmatedReads ] arg             List of files containing unmated reads 
+                                        of (e.g. single-end reads)
+  -1 [ --mates1 ] arg                   File containing the #1 mates
+  -2 [ --mates2 ] arg                   File containing the #2 mates
+
+
+'alevin-specific Options:
+  -v [ --version ]                      print version string
+  -h [ --help ]                         produce help message
+  -o [ --output ] arg                   Output quantification directory...
 ```
-
-Try kb-python. If properly installed you should see the following after typing kb:
-
----
-```
-usage: kb [-h] [--list] <CMD> ...
-
-kb_python 0.28.2
-
-positional arguments:
-  <CMD>
-    info      Display package and citation information
-    compile   Compile kallisto and bustools binaries from source
-    ref       Build a kallisto index and transcript-to-gene mapping
-    count     Generate count matrices from a set of single-cell FASTQ files
-
-options:
-  -h, --help  Show this help message and exit
-  --list      Display list of supported single-cell technologies
-```
----
 
 ## Installation of R packages (in your laptop)
 
