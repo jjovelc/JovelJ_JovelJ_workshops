@@ -57,8 +57,7 @@ source ~/.bashrc
 After completing these steps, Mamba should be installed and ready to use. You can verify the installation by typing mamba in the terminal.
 
 
-
-### Installation of salmon
+## Installation of salmon
 
 ```bash
 mamba create -n salmon -c bioconda salmon -y
@@ -163,13 +162,6 @@ install.packages("tidyverse")
 
 NOTE: If you run into any trouble, just contact me (juan.jovel@ucalgary.ca).
 
-### 4. Install DoubletFinder
-
-```bash
-
-install.packages("DoubletFinder")
-
-```
 
 ### 5. Install EnhacedVolcano
 
