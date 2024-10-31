@@ -1,6 +1,6 @@
 # Getting ready for the scRNAseq data analysis course
 
-This document guides you through the installation of all software required for the scRNAseq data analysis course
+This document guides you through the installation of all software required for the scRNAseq data analysis course. If you are using a Mac laptop, you are ready to go. If you are using a Windows laptop, you would need to install a terminal, options are MobaXterm [install MobaXterm] (https://mobaxterm.mobatek.net/download.html), Windows subsystem for linux [install WSL] (https://learn.microsoft.com/en-us/windows/wsl/install), or PuTTY [install PuTTY] (https://www.putty.org/). If you are using a Linux laptop, you are a crack and don't need any assistance.
 
 ## Installation of Mamba (in ARC server)
 
