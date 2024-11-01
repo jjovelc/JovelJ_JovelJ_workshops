@@ -178,3 +178,13 @@ install.packages("EnhancedVolcano")
 remotes::install_github("mojaveazure/seurat-disk")
 
 ```
+
+### 7. Install MAST
+
+```bash
+
+if (!requireNamespace("MAST", quietly = TRUE))
+    BiocManager::install("MAST")
+
+```
+
