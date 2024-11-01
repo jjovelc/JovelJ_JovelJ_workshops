@@ -170,3 +170,11 @@ NOTE: If you run into any trouble, just contact me (juan.jovel@ucalgary.ca).
 install.packages("EnhancedVolcano")
 
 ```
+
+### 6. Install SeuratDisk
+
+```bash
+
+remotes::install_github("mojaveazure/seurat-disk")
+
+```
