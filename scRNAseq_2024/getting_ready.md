@@ -181,4 +181,10 @@ remotes::install_github("mojaveazure/seurat-disk")
 
 ```
 
+### 7. Install anndata
 
+```bash
+
+BiocManager::install("anndata")
+
+```
