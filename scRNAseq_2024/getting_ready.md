@@ -171,7 +171,7 @@ install.packages("EnhancedVolcano")
 
 ```
 
-Added after enail to participants.
+* Added after email to participants. *
 
 ### 6. Install SeuratDisk
 
