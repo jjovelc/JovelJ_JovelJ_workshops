@@ -1,0 +1,31 @@
+# go to the github repo for monocle3
+wget https://github.com/cole-trapnell-lab/monocle3/archive/refs/tags/v1.3.1.zip
+
+# unzip source code file
+unzip v1.3.1.zip
+
+# go to extracted dir
+cd monocle3-1.3.1
+
+# list content
+ls
+# 00travis.yml		LICENSE.md		R			examples		monocle3.Rproj		vignettes
+# DESCRIPTION		NAMESPACE		README.md		inst			src
+# LICENSE			NEWS.md			code-of-conduct.md	man			tests
+
+##### START R CONSOLE COMMANDS #####
+
+# Go to Rstudio and paste the following command on the console:
+# this will prioritize system Clang
+Sys.setenv(PATH = paste("/usr/bin", Sys.getenv("PATH"), sep = ":"))
+
+# Set environment variables for compilers
+Sys.setenv(CC = "/usr/bin/clang")
+Sys.setenv(CXX = "/usr/bin/clang++")
+
+# Check which clang is being used
+system("which clang")
+
+##### END R CONSOLE COMMANDS #####
+
+
