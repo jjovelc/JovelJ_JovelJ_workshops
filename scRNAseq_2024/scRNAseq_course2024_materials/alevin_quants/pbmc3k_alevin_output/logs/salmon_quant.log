@@ -1,0 +1,26 @@
+[2024-10-29 16:53:35.060] [jointLog] [info] setting maxHashResizeThreads to 12
+[2024-10-29 16:53:35.060] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
+[2024-10-29 16:53:35.060] [jointLog] [info] The --mimicBT2, --mimicStrictBT2 and --hardFilter flags imply mapping validation (--validateMappings). Enabling mapping validation.
+[2024-10-29 16:53:35.060] [jointLog] [info] Usage of --validateMappings implies use of minScoreFraction. Since not explicitly specified, it is being set to 0.65
+[2024-10-29 16:53:35.060] [jointLog] [info] The use of range-factorized equivalence classes does not make sense in conjunction with --hardFilter.  Disabling range-factorized equivalence classes. 
+[2024-10-29 16:53:35.060] [jointLog] [info] Setting consensusSlack to selective-alignment default of 0.35.
+[2024-10-29 16:53:35.060] [jointLog] [info] Using default value of 0.87 for minScoreFraction in Alevin
+Using default value of 0.6 for consensusSlack in Alevin
+[2024-10-29 16:54:56.677] [jointLog] [info] There is 1 library.
+[2024-10-29 16:54:56.678] [jointLog] [info] Loading pufferfish index
+[2024-10-29 16:54:56.678] [jointLog] [info] Loading dense pufferfish index.
+[2024-10-29 16:54:57.460] [jointLog] [info] done
+[2024-10-29 16:54:57.492] [jointLog] [info] Index contained 193,760 targets
+[2024-10-29 16:54:57.536] [jointLog] [info] Number of decoys : 0
+[2024-10-29 16:59:22.628] [jointLog] [info] Computed 179,253 rich equivalence classes for further processing
+[2024-10-29 16:59:22.628] [jointLog] [info] Counted 36,565,133 total reads in the equivalence classes 
+[2024-10-29 16:59:22.628] [jointLog] [info] Number of fragments discarded because they are best-mapped to decoys : 0
+[2024-10-29 16:59:22.628] [jointLog] [warning] Found 170188 reads with `N` in the UMI sequence and ignored the reads.
+Please report on github if this number is too large
+[2024-10-29 16:59:22.628] [jointLog] [info] Mapping rate = 69.1909%
+
+[2024-10-29 16:59:22.628] [jointLog] [info] finished quantifyLibrary()
+[2024-10-29 17:00:08.907] [jointLog] [warning] NOTE: Read Lib [[ /work/vetmed_data/jj/projects/juanJovel/courses/scRNAseq_2024/pbmc3k_fastqs/quant_salmon/ACGCGGAA_swap_R1.fastq.gz, /work/vetmed_data/jj/projects/juanJovel/courses/scRNAseq_2024/pbmc3k_fastqs/quant_salmon/ACGCGGAA_swap_R2.fastq.gz]] :
+
+Found no concordant and consistent mappings. If this is a paired-end library, are you sure the reads are properly paired? check the file: /work/vetmed_data/jj/projects/juanJovel/courses/scRNAseq_2024/pbmc3k_fastqs/quant_salmon/ACGCGGAA_alevin_output/lib_format_counts.json for details
+
