@@ -46,8 +46,11 @@ hs_GRCh38_113_splici_python
 
 Containing the following:
 
-clean_gtf.gtf  gene_id_to_name.tsv  missing_gene_id_or_name_records.gtf  splici_fl146.fa  splici_fl146_t2g_3col.tsv 
-
+clean_gtf.gtf  
+gene_id_to_name.tsv  
+missing_gene_id_or_name_records.gtf  
+splici_fl146.fa  
+splici_fl146_t2g_3col.tsv 
  
 4. Generate file containing Ensembl and HGNC gene IDs 
 
