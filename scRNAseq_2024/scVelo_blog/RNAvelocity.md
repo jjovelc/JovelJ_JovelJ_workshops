@@ -17,7 +17,7 @@ As it should be obvious, this method has multiple applications in diverse resear
 ## Computational pipeline
 ### Quantification
 
-Data used in this tutorial corresponds to PBMCs from a healthy individual, descriibed [here] (https://cf.10xgenomics.com/samples/cell-exp/4.0.0/Parent_NGSC3_DI_PBMC/Parent_NGSC3_DI_PBMC_web_summary.html).
+Data used in this tutorial corresponds to PBMCs from a healthy individual, descriibed [here](https://cf.10xgenomics.com/samples/cell-exp/4.0.0/Parent_NGSC3_DI_PBMC/Parent_NGSC3_DI_PBMC_web_summary.html).
 
 1. Create a new mamba environment with the required software 
    
@@ -90,7 +90,7 @@ salmon alevin -i hs_GRCh38_splici_fl146_idx -p 16 -l ISR --chromium --sketch \
 
 ### Post-processing: RNA velocity 
 
- Now that the spliced and unspliced quantification has been conducted, we are ready for the RNA velocity analysis with scVelo (an alternative approach is [velocyto https://velocyto.org/], still not tested by the author).
+ Now that the spliced and unspliced quantification has been conducted, we are ready for the RNA velocity analysis with scVelo (an alternative approach is [velocyto](https://velocyto.org/), still not tested by the author).
 
 1. Installation of scVelo
 
