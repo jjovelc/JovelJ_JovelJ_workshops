@@ -295,7 +295,19 @@ Figure 7. Cell types as defined by celltypist including scVelo trajectories, cel
 
 Other modifications could also be assayed. 
 
+Remember that the complete code is available in script  scVelo_withClustering-labelling.py .
+
 If you have questions, don't hesitate in contacting me: juan.jovel@ucalgary.ca
+
+### References
+
+1. La Manno, G., Soldatov, R., Zeisel, A. et al. RNA velocity of single cells. Nature 560, 494–498 (2018). https://doi.org/10.1038/s41586-018-0414-6 
+
+2. Domínguez Conde C, Xu C, Jarvis LB. et al. Cross-tissue immune cell analysis reveals tissue-specific features in humans. Science. 2022 May 13;376(6594):eabl5197. doi: 10.1126/science.abl5197. 
+
+3. Xu C, Prete M, Webb S, Jardine L, Stewart BJ, Hoo R, He P, Meyer KB, Teichmann SA. Automatic cell-type harmonization and integration across Human Cell Atlas datasets. Cell. 2023 Dec 21;186(26):5876-5891.e20. doi: 10.1016/j.cell.2023.11.026. PMID: 38134877.  
+
+ 
 
 
 
