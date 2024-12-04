@@ -1,9 +1,9 @@
 # RNA velocity
 <br>
-RNA velocity is a computational framework that allows inference of the future state of individual cells in single-cell RNAseq experiments. While RNAseq data provides a static snapshot of RNA transcription, it reveals little about dynamic processes that occur during development, but also in response to stimuli. Addressing this challenge, La Manno and collaborators (2018) [1] introduced RNA velocity, leveragin the observation that nascent (unspliced) RNA exhibits different dynamics compared to mature (spliced) RNA. Based on the analysis of the ratio of spliced and non-spliced RNA, the direction of a cell state transition is predicted in the high-dimension gene expression space, offering insights into cellular trajectories.<br><br>
+RNA velocity is a computational framework that allows inference of the future state of individual cells in single-cell RNAseq experiments. While RNAseq data provides a static snapshot of RNA transcription, it reveals little about dynamic processes that occur during development, or in response to stimuli. Addressing this challenge, La Manno and collaborators (2018) [1] introduced RNA velocity, leveraging the observation that nascent (unspliced) RNA exhibits different dynamics compared to mature (spliced) RNA. Based on the analysis of the ratio of spliced and unspliced RNA, the direction of a cell state transition is predicted in the high-dimension gene expression space, offering insights into cellular trajectories.<br><br>
 At its core, RNA velocity models transcription activity using splicing kinetics equations, assuming steady state or dynamical models. However, such models can seem abstract. Here is a simpler analogy: Imagine observing a UMAP plot as a dynamic movie where cells move from one state to another over time. In this context, RNA velocity predicts those transitions. However, RNA velocity does not measure transcription directly but instead leverages comparison of unspliced and spliced RNA to make inferences.  
 <br><br>
-Unspliced molecules represent RNA that is being made; the higher this proportion the more active the transcription of a particular type of gene. The steady state RNA (spliced) represents the pool of RNA already synthesized. Based on the first, the magnitude of the second can be calculated, and transitions can be predicted accordingly.  A useful analogy is motion in physics, the steady state levels of RNA correspond to a cell’s current position, while nascent (unspliced) RNA reflects its acceleration.  With these two components, RNA velocity calculates a cell’s future position (state) at time t + 1.
+Unspliced molecules represent RNA that is being made; the higher this proportion the more active the transcription of particular types of genes. The steady state RNA (spliced) represents the pool of RNA already synthesized. Based on the first, the magnitude of the second can be calculated, and transitions can be predicted accordingly. A useful analogy is motion in physics, the steady state levels of RNA correspond to a cell’s current position, while nascent (unspliced) RNA reflects its acceleration. With these two components, RNA velocity calculates a cell’s future position (state) at time t + 1.
 <br><br>
 As it should be obvious, this method has multiple applications in diverse research areas, including: 
 
@@ -20,11 +20,11 @@ As it should be obvious, this method has multiple applications in diverse resear
 1. Create a new mamba environment with the required software 
    
 ```bash
-mamba create -n RNAvel python=3.11 numpy=1.23 pandas=1.5 scanpy=1.9 pyroe salmon alevin-fry 
-mamba activate RNAvel 
+mamba create -n RNAvel python=3.11 numpy=1.23 pandas=1.5 scanpy=1.9 pyroe salmon alevin-fry
+mamba activate RNAvel
 ```
 
-1. Download genome and GTF files 
+2. Download genome and GTF files 
 
 ```bash
 # genome 
@@ -40,11 +40,9 @@ wget https://ftp.ensembl.org/pub/current_gtf/homo_sapiens/Homo_sapiens.GRCh38.11
 pyroe make-splici "$GENOME" "$GTF" 151 hs_GRCh38_113_splici_python --flank-trim-length 5 --filename-prefix splici 
 ```
 
-The above command line will produce folder:
+The above command line will produce folder hs_GRCh38_113_splici_python  
 
-hs_GRCh38_113_splici_python  
-
-Containing the following:
+Containing the following files:
 
 ```bash
 clean_gtf.gtf  
@@ -124,13 +122,8 @@ The first step is to import the results produced by alevin-fry which are in fold
 
 ```python
   frydir = "pbmc_splici_quant_res"
-  e2n_path = "t2g.txt"
+  e2n_path = " hs_ensembl-ID_2_HGNC-ID.txt"
   adata = load_fry(frydir, output_format="velocity")
-```
-File 't2g.txt' can be created with the following command:
-
-```bash
-  python create_t2g.py Homo_sapiens.GRCh38.113.chr_patch_hapl_scaff.gtf
 ```
 
 Few more python lines of code will allow generation of a scVelo plot:
@@ -186,7 +179,7 @@ We can modify the above script to include Leiden clustering:
   sc.tl.leiden(adata, resolution=0.5)  # Adjust resolution for granularity
 ```
 
-Leiden clustering will produce a UMAP plot like this:
+Leiden clusters can be used to produce a UMAP plot like this:
 
 <img src="figures/umap_clusters.png" alt="UMAP clusters" width="500">
 
@@ -194,11 +187,11 @@ Figure 2. Leiden clusters.
 
 Subsequently, celltypist [2,3] can be used to classify cells (to assign cell types). 
 
-Leiden clusters are not going to be used by celltypist to classify cell types, but gives us a first idea of the number of cell types present in the dataset and could also be used to manually annotate cell clusters, identifying markers by differential expression analysis, as exemplified in the workshop.
+However, Leiden clusters are not used by celltypist to classify cell types, but gives us a first idea of the number of cell types (clusters) present in the dataset. Such clusters could also be used to manually annotate cell clusters, identifying markers by differential expression analysis, as exemplified in the workshop.
 
-Celltypist maps the gene expression profile of individual cells in the quety dataset to the reference model and uses this mapping to prefict the most probable cell type for each cell. 
+Celltypist maps the gene expression profile of individual cells in the query dataset to the reference model and uses this mapping to prefict the most probable cell type for each cell. 
 
-A hybrid of the two approaches can be used too. It is, the leiden clusters could be manually annotated using the information provided by celltypist plus any other trustable source of information. 
+A hybrid approach including manual annotation and celltypist annotations can be used too. It is, the leiden clusters could be manually annotated using the information provided by celltypist plus any other trustable source of information.
 
 To use celltypist, first, download the machine learning models for cell classification.
 
@@ -208,22 +201,21 @@ To use celltypist, first, download the machine learning models for cell classifi
   models.download_models()
 ```
 
-Run the above commands in the python console. It will tell you in which directory the models were stored. It should be something like: '/home/<user>/.celltypist/data/models/'. Then use the corresponding model for cell classification:
+Run the above commands in the python console. It will print the path in which the models were stored. It should be something like: '/home/<user>/.celltypist/data/models/'. Then use the corresponding model for cell classification:
 
 ```python
   # Load the model
   model_path = "/home/juan.jovel/.celltypist/data/models/Immune_All_Low.pkl"
   model = models.Model.load(model = model_path)
   predictions = annotate(adata, model)
-  adata.obs["cell_types"] = predictions.predicted_labels  # Add predicted cell types to AnnData
+  adata.obs["cell_types"] = predictions.predicted_labels
 ```
 
-The newly-classified cell types by celltypist can be saved or visualized before applying scVelo.
+The newly-classified cell types can be saved or visualized before applying scVelo.
 
 ```python
   sc.pl.umap(adata, color="cell_types", save="_cell_types.png")
 ```
-
 <img src="figures/umap_cell_types.png" alt="celltypist clusters" width="600">
 
 Figure 3. Cell types as defined by celltypist.
@@ -258,14 +250,13 @@ All the data contained in the scVelo object is saved in 'pbmc_full_dim_scvelo.h5
   ...
 ```
 
-This produces a more interesting plot. However, cell type labels are too big and they overlap to each other.
-
+This produces a more interesting plot. However, cell type labels are too big and some of them overlap.
 
 <img src="figures/scvelo_pbmc_velocity_stream_cell_types.png" alt="celltypist clusters + scVelo" width="500">
 
 Figure 4. Cell types as defined by celltypist including scVelo trajectories.
 
-The size of labels can be reduced by manually indicating the fontsize:
+The size of labels can be reduced by manually defining the fontsize:
 
 ```python
     scv.pl.velocity_embedding_stream(
@@ -279,7 +270,7 @@ The size of labels can be reduced by manually indicating the fontsize:
 
 <img src="figures/scvelo_pbmc_velocity_stream_cell_types_defaults.png" alt="celltypist clusters + scVelo 2" width="500">
 
-Figure 5. Cell types as defined by celltypist including scVelo trajectories, smaller font.
+Figure 5. Cell types as defined by celltypist including scVelo trajectories, smaller font (size=6).
 
 It is also possible to adjust the transparency of the plot to improve readability.
 
@@ -313,13 +304,17 @@ Labels of cell types could also be placed outside of the main UMAP plot.
     )
 ```
 
-<img src="figures/scvelo_pbmc_velocity_stream_cell_types_namesOutside.png" alt="celltypist clusters + scVelo 2" width="500">
+<img src="figures/scvelo_pbmc_velocity_stream_cell_types_namesOutside.png" alt="celltypist clusters + scVelo 2" width="600">
 
 Figure 7. Cell types as defined by celltypist including scVelo trajectories, cell type labels outside.
 
 Other modifications could also be assayed. 
 
-Remember that the complete code is available in script  scVelo_withClustering-labelling.py .
+Remember that the complete code is available in script  scVelo_withClustering-labelling.py. scVelo outputs a series of warning, if that wants to be prevented, the following command can be used.
+
+```bash
+  PYTHONWARNINGS=ignore python scVelo_withClustering-labelling.py
+```
 
 If you have questions, don't hesitate in contacting me: juan.jovel@ucalgary.ca
 
