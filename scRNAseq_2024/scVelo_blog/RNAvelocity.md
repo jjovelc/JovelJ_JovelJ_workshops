@@ -265,7 +265,7 @@ This produces a more interesting plot. However, cell type labels are too big and
 
 Figure 4. Cell types as defined by celltypist including scVelo trajectories.
 
-The size of labels can be reduces by manually indicating the fontsize:
+The size of labels can be reduced by manually indicating the fontsize:
 
 ```python
     scv.pl.velocity_embedding_stream(
@@ -283,11 +283,35 @@ Figure 5. Cell types as defined by celltypist including scVelo trajectories, sma
 
 It is also possible to adjust the transparency of the plot to improve readability.
 
+```python
+  scv.pl.velocity_embedding_stream(
+    adata,
+    basis="umap",
+    color="cell_types",
+    save="pbmc_velocity_stream_cell_types_transparencyAdjusted.png",
+    fontsize=6,
+    legend_fontsize=6,
+    alpha=0.7  # Reduce opacity for clarity
+)
+```
+
 <img src="figures/scvelo_pbmc_velocity_stream_cell_types_transparencyAdjusted.png" alt="celltypist clusters + scVelo 3" width="500">
 
 Figure 6. Cell types as defined by celltypist including scVelo trajectories, smaller font.
 
 Labels of cell types could also be placed outside of the main UMAP plot.
+
+```python
+    scv.pl.velocity_embedding_stream(
+    adata,
+    basis="umap",
+    color="cell_types",
+    save="pbmc_velocity_stream_cell_types_namesOutside.png",
+    legend_loc="right margin",  # Move legend to the right
+    legend_fontsize=6,
+    fontsize=6
+    )
+```
 
 <img src="figures/scvelo_pbmc_velocity_stream_cell_types_namesOutside.png" alt="celltypist clusters + scVelo 2" width="500">
 
