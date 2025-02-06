@@ -1,0 +1,1139 @@
+---
+title: "Bulk RNAseq Analysis - 4 groups"
+author: "Ewandson Luiz Lameu, Juan Jovel"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: kate
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    code_folding: hide
+    number_sections: true
+editor_options:
+  chunk_output_type: inline
+keep_md: no
+---
+
+```{r load-packages, include=FALSE,echo=F}
+
+library(DESeq2)
+library(RColorBrewer)
+library(ggplot2)
+library(gplots)
+library(pheatmap)
+library(EnhancedVolcano)
+library(biomaRt)
+library(ggpubr)
+library(DT)
+library(clusterProfiler)
+library(org.Hs.eg.db)
+library(enrichplot)
+library(DOSE)
+library(VennDiagram)
+library(grid)
+library(ggvenn)
+library(NMF)
+
+set.seed(2023)
+```
+
+
+```{r setup, echo=FALSE}
+#Generating reports
+knitr::opts_chunk$set(echo = F, message = F, warning = F, fig.height = 8,fig.width = 10, cache=T, dev = "png",dpi = 300)
+
+old <- Sys.time() # get start time
+```
+
+
+```{r set working directory and upload data, echo=FALSE}
+setwd('/Users/juanjovel/jj/courses/2023/RNAseq_w-Schneider')
+
+data_file = 'control_vs_treatments_counts.tsv'
+metadata_file = 'control_vs_treatment_metadata.tsv'
+
+#load transcript expression count table
+data_table = read.table(data_file, sep = '\t', header = T, row.names = 1)
+#fix transcripts names
+rownames(data_table)<-sub("\\..*", "", rownames(data_table))
+
+#filter transcrips present less than 2 samples
+data_table<-data_table[rowSums((data_table>0.01)*1)>1,]
+##filter transcripts present less than 200 total counts or row mean smaller than 10
+#data_table<-data_table[rowSums(data_table)>200,]
+#data_table<-data_table[rowMeans(data_table)>10,]
+
+# load metadata
+metadata = read.table(metadata_file, sep = '\t', header = T, row.names = 1)
+
+data_matrix = as.matrix(round(data_table, digits = 0))
+
+```
+
+
+```{r create DeSeq2 object and do normalization, echo=FALSE}
+
+# Create DESeq2 object to contain data and metadata
+dds = DESeqDataSetFromMatrix(countData = data_matrix, colData = metadata,
+                             design =~ group)
+
+# Calculate size factor (library size) for normalization
+dds = estimateSizeFactors(dds)
+
+# Apply regularized logarithmic transformation
+rld = rlog(dds, fitType = "local")
+
+# # Apply variance stabilizing transformation
+#vsd = vst(dds, fitType = "local")
+```
+
+<br> 
+<br>
+
+In this pipeline, we'll guide you through fundamental analyses for bulk RNAseq data. Our step-by-step approach includes PCA (Principal Component Analysis), Differential Expression Analysis using DESeq2, Enrichment Analysis with the clusterProfiler package, and the creation of informative heatmaps to visualize the clustering of differentially expressed transcripts.
+
+
+<br> 
+<br>
+
+# **PCA**
+
+<br> 
+
+Principal Component Analysis (PCA) is a way to simplify complex data while keeping as much information as possible. It transforms the data into new variables called principal components.
+
+The first principal component contains the most variation or information from the original data. Each following component contains less and less. All these components are uncorrelated, meaning they provide unique information.
+
+In short, PCA is like viewing your data from the best angle that shows the most spread or variation, helping you understand it while making it simpler.
+```{r PCA,fig.width=7,fig.height=7,echo=F,include=T}
+
+# Calculate the first two Principal Components (Eigen's vectors)
+data = plotPCA(rld, intgroup = c("group"), returnData = T)
+
+
+# Calculate percentage of variance for each principal component
+percentVar = round(100 * attr(data, "percentVar"))
+
+#pca_plot = gsub('.txt', '_PCA.png', data_file)
+#png(pca_plot)
+# Create first layer of plot which will include the x and y values as well
+# as the factor used for coloring (x and y labels are defined too)
+PCA_EucDist <- ggplot(data, aes(x=data$PC1, y=data$PC2, 
+                     color = group)) +
+                     scale_color_manual(values = c("#003f5c","#ff6e54","#ffa600","#808080"))+
+                     scale_shape_manual(values = c(15, 16, 17, 18))+
+                     xlab(paste("PC1 :", percentVar[1], "% variance")) +
+                     ylab(paste("PC2 :", percentVar[2], "% variance"))
+  
+# Add the points (dots) layer, and define shape and size of dots
+PCA_EucDist + geom_point(size = 5) +
+  # Add labels to each sample in the plot
+  geom_text(aes(label=data$name), hjust=0.5, vjust=2, color="black")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 0, size = 15, colour = "black",  hjust = 1, face= "bold"), 
+        axis.text.y = element_text(colour = "black", size = 15, face = "bold"),
+        axis.title.y = element_text(size = 15, face = "bold"),
+        legend.title = element_text(size = 10, face = "bold"),
+        axis.title.x = element_text(size = 15, face = "bold"),
+        legend.text = element_text(size = 10, face = "bold", colour = "black"),
+        legend.position = "bottom",
+        plot.title = element_text(size=20,face="bold"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")
+        )
+  
+
+
+
+```
+<br> 
+<br>
+
+# **Differential Expression Analysis**
+
+<br> 
+
+Differential Expression Analysis in bulk RNAseq is a method for comparing gene expression levels between two distinct biological conditions. It involves sequencing the RNA in each sample, quantifying the output to gauge gene activity levels, and applying statistical analysis to identify genes that are significantly more active (upregulated) or less active (downregulated) in one condition versus the other. This technique offers valuable insights into the molecular mechanisms underlying the observed differences between the conditions under study.
+
+We applied a filter to the results to consider only the genes where the absolute value of the log2foldchange was smaller than 10.
+
+<br>
+
+```{r deseq2 contrasts}
+
+# Iterate along contrasts
+contrasts_list <- list(
+  control_vs_TCR        = c("group", "02_TCR", "01_control"),
+  control_vs_INFL3      = c("group", "03_INFL3", "01_control"),
+  control_vs_TCR_INFL3  = c("group", "04_TCR-INFL3", "01_control")
+)
+```
+
+
+```{r running Deseq2}
+
+# Run Deseq2
+dds <- DESeq(dds)
+
+```
+
+```{r get contrasts and annotation, echo=FALSE}
+
+run_contrasts <- function(dds, chosen_contrast){
+  # get the contrasts
+  res = results(dds, contrast = chosen_contrast)
+  #res <- res[!is.na(res$log2FoldChange) & abs(res$log2FoldChange) < 10,]
+  
+  # Filtering for only significant data, min = 0.05
+  sign_res = subset(res, padj < 0.0001)
+
+  sign_res = cbind(Transcript=rownames(sign_res), sign_res)
+
+  return(sign_res)
+}
+
+```
+
+
+```{r getting annotations, echo=FALSE}
+######### Add annotation only for DE features #########
+
+# Extract DE transcripts name from sign_data object
+my_mart = useMart("ensembl", dataset = 'hsapiens_gene_ensembl')
+
+# attributes names
+my_attributes = c("ensembl_transcript_id",
+                  "hgnc_symbol",
+                   "wikigene_description",
+                   "name_1006",
+                   "definition_1006",
+                   "namespace_1003"
+                   )
+
+# function to download the info
+getRecordsFromMart <- function(attributes, filters, values, mart) {
+  records <- getBM(attributes = attributes, filters = filters, values = values, mart = mart)
+  
+  return(records)
+}
+
+
+#function to rename the name of some columns from the records files
+renameColumns <- function(records_df) {
+  colnames(records_df)[4] = "GO_term"
+  colnames(records_df)[5] = "GO_term_definition"
+  colnames(records_df)[6] = "GO_class"
+
+  return(records_df)
+}
+
+
+# function to match the transcript files with annotation info  
+getMatchingLines <- function(transcripts, records_renamed) {
+  first_matches_df <- data.frame()  # Initialize an empty dataframe
+  
+  for (i in 1:length(transcripts)) {
+    matching_lines <- records[grepl(transcripts[i], records_renamed$ensembl_transcript_id), ]
+    current_first_match <- matching_lines[1, ]
+    first_matches_df <- rbind(first_matches_df, current_first_match)
+  }
+  
+  return(first_matches_df)
+}
+
+
+
+```
+
+```{r box plots }
+makeBoxPlots <- function(de_transcripts, filtered_metadata, count_table, contrasts){
+  for (i in 1:5){
+    file_name = paste(de_transcripts[i], "pdf", sep = ".")
+    
+    extracted_row = count_table[de_transcripts[i],]
+    group = filtered_metadata$group
+    names = colnames(count_table)
+    counts = as.numeric(extracted_row[names])
+    
+    trans_df = data.frame(names=names,
+                          group=group,
+                          counts=counts)
+    
+    p = ggplot(trans_df, aes(x=group, y=counts))
+    pdf(paste0(contrasts,"_",file_name))
+    print(p + geom_boxplot(aes(fill=factor(group))) + 
+             theme_bw() + xlab("Groups") + ylab("Counts") +
+             scale_fill_manual(values = c("dodgerblue1", "goldenrod1")) +
+             geom_jitter(width = 0.2, height = 0)
+    )
+
+    dev.off()
+    
+  }
+  
+}
+```
+
+
+```{r run deseq and annotation control_vs_TCR}
+
+# run the contrasts, outputs the significant results only
+sign_res <- run_contrasts(dds,contrasts_list$control_vs_TCR)
+
+# getting the significant transcripts names
+trans <- sign_res$Transcript
+
+# download the annotation info for the significant transcripts
+records <- getRecordsFromMart(my_attributes, "ensembl_transcript_id", trans, my_mart)
+
+#rename of some columns from the records files
+records_renamed <- renameColumns(records)
+
+#match the transcript files with annotation info  
+annotations_df <- getMatchingLines(trans, records_renamed)
+
+# merge the annotation with the significant DE transcripts 
+sign_res_annotated = data.frame(cbind(sign_res, annotations_df))
+
+# save files
+write.table(sign_res_annotated, "Control_vs_TCR_Diff_Exp_q0.0001.txt", 
+            sep = '\t', quote = F, row.names = F)
+
+# Create boxplots
+filtered_metadata<-metadata %>% filter(group=="01_control" | group=="02_TCR" )
+makeBoxPlots(trans, filtered_metadata, data_table, "control_vs_TCR")
+
+
+# saving the significant results for the specific contrast
+sign_res_annotated_control_vs_TCR <- sign_res_annotated
+```
+
+```{r run deseq and annotation control_vs_INFL3}
+
+# run the contrasts, outputs the significant results only
+sign_res <- run_contrasts(dds,contrasts_list$control_vs_INFL3)
+
+# getting the significant transcripts names
+trans <- sign_res$Transcript
+
+# download the annotation info for the significant transcripts
+records <- getRecordsFromMart(my_attributes, "ensembl_transcript_id", trans, my_mart)
+
+#rename of some columns from the records files
+records_renamed <- renameColumns(records)
+
+#match the transcript files with annotation info  
+annotations_df <- getMatchingLines(trans, records_renamed)
+
+# merge the annotation with the significant DE transcripts 
+sign_res_annotated = data.frame(cbind(sign_res, annotations_df))
+
+# save files
+write.table(sign_res_annotated, "Control_vs_INFL3_Diff_Exp_q0.0001.txt", 
+            sep = '\t', quote = F, row.names = F)
+
+# Create boxplots
+filtered_metadata<-metadata %>% filter(group=="01_control" | group=="03_INFL3" )
+makeBoxPlots(trans, filtered_metadata, data_table, "control_vs_INFL3")
+
+
+# saving the significant results for the specific contrast
+sign_res_annotated_control_vs_INFL3 <- sign_res_annotated
+```
+
+
+```{r run deseq and annotation control_vs_TCR_INFL3}
+
+# run the contrasts, outputs the significant results only
+sign_res <- run_contrasts(dds,contrasts_list$control_vs_TCR_INFL3)
+
+# getting the significant transcripts names
+trans <- sign_res$Transcript
+
+# download the annotation info for the significant transcripts
+records <- getRecordsFromMart(my_attributes, "ensembl_transcript_id", trans, my_mart)
+
+#rename of some columns from the records files
+records_renamed <- renameColumns(records)
+
+#match the transcript files with annotation info  
+annotations_df <- getMatchingLines(trans, records_renamed)
+
+# merge the annotation with the significant DE transcripts 
+sign_res_annotated = data.frame(cbind(sign_res, annotations_df))
+
+# save files
+write.table(sign_res_annotated, "Control_vs_TCR_INFL3_Diff_Exp_q0.0001.txt", 
+            sep = '\t', quote = F, row.names = F)
+
+# Create boxplots
+filtered_metadata<-metadata %>% filter(group=="01_control" | group=="04_TCR-INFL3" )
+makeBoxPlots(trans, filtered_metadata, data_table, "control_vs_TCR_INFL3")
+
+
+# saving the significant results for the specific contrast
+sign_res_annotated_control_vs_TCR_INFL3 <- sign_res_annotated
+```
+
+<br>
+
+## **Volcano Plots**{.tabset}
+
+<br>
+
+A Volcano plot is a graph that shows both the size and statistical significance of changes in gene expression between two conditions.
+
+On the plot:
+
+  * The x-axis shows the size of change (upregulated to the right, downregulated to the left).
+  
+  * The y-axis shows how statistically significant that change is (more significant higher up).
+  
+The plot helps quickly identify genes with significant and large changes, appearing as peaks on the 'volcano'.
+
+
+```{r volcano plots, echo=FALSE,fig.width=10,fig.height=15,echo=F,include=T} 
+
+makeVolcanoPlot <- function(df, title_name){
+  keyvals <- ifelse(
+    df$log2FoldChange < -1, 'forestgreen',
+    ifelse(df$log2FoldChange > 1, 'firebrick1',
+           'dodgerblue1'))
+  
+  keyvals[is.na(keyvals)] <- 'black'
+  names(keyvals)[keyvals == 'firebrick1'] <- 'High'
+  names(keyvals)[keyvals == 'dodgerblue1'] <- 'small FC'
+  names(keyvals)[keyvals == 'forestgreen'] <- 'Low'
+  
+  evp <- EnhancedVolcano(df,
+                         lab = df$hgnc_symbol,
+                         x = 'log2FoldChange',
+                         y = 'pvalue',
+                         pCutoff = 0.05,
+                         FCcutoff = 1,
+                         colCustom = keyvals,
+                         title = paste0("Volcano plot: ",title_name, ", HGNC Symbol"),
+                         titleLabSize = 18,
+                         subtitle = NULL,
+                         colAlpha = 0.65,
+                         shape = 20,
+                         pointSize = 3,
+                         labSize = 3)
+
+print(evp)
+}
+
+```
+
+<br>
+
+### **TCR vs Control**
+
+<br>
+
+```{r volcano 1,fig.width=10,fig.height=10,echo=F,include=T}
+
+makeVolcanoPlot(sign_res_annotated_control_vs_TCR,"TCR/Control" )
+
+datatable(sign_res_annotated_control_vs_TCR, 
+          rownames= FALSE,
+          filter = 'top',
+          extensions = 'Buttons',
+          options = list(scrollX = TRUE,
+                         pageLength = 3,
+                         dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                         caption = "Differential Expression Results from DESeq2")) 
+
+```
+
+<br>
+
+### **INFL3 vs Control**
+
+<br>
+
+```{r volcano 2,fig.width=10,fig.height=10,echo=F,include=T}
+
+makeVolcanoPlot(sign_res_annotated_control_vs_INFL3,"INFL3/Control" )
+
+datatable(sign_res_annotated_control_vs_INFL3, 
+          rownames= FALSE,
+          filter = 'top',
+          extensions = 'Buttons',
+          options = list(scrollX = TRUE,
+                         pageLength = 3,
+                         dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                         caption = "Differential Expression Results from DESeq2")) 
+
+```
+
+
+<br>
+
+### **TCR-INFL3 vs Control**
+
+<br>
+
+```{r volcano 3,fig.width=10,fig.height=10,echo=F,include=T}
+
+makeVolcanoPlot(sign_res_annotated_control_vs_TCR_INFL3,"TCR-INFL3/Control" )
+
+datatable(sign_res_annotated_control_vs_TCR_INFL3, 
+          rownames= FALSE,
+          filter = 'top',
+          extensions = 'Buttons',
+          options = list(scrollX = TRUE,
+                         pageLength = 3,
+                         dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                         caption = "Differential Expression Results from DESeq2")) 
+
+```
+
+
+<br>
+
+## **Intersections**{.tabset}
+
+
+The intersections between groups shows the overlapping genes from a DESeq2 analysis. To do so we will use Venn Diagrams.
+
+
+### **Upregulated Transcripts**
+
+The Venn diagrams show the intersections between the upregulated genes on TCR, INFL3 and TCR-INFL3 groups, where the base of the differential was the control group.
+
+```{r Venn diagram up,fig.width=5,fig.height=5,echo=F,include=T}
+
+
+# filter table to keep only the upregulated transcripts
+trans_control_vs_TCR <- sign_res_annotated_control_vs_TCR[sign_res_annotated_control_vs_TCR$log2FoldChange>0,1] 
+
+trans_control_vs_INFL3 <- sign_res_annotated_control_vs_INFL3[sign_res_annotated_control_vs_INFL3$log2FoldChange>0,1]   
+
+trans_control_vs_TCR_INFL3 <- sign_res_annotated_control_vs_TCR_INFL3[sign_res_annotated_control_vs_TCR_INFL3$log2FoldChange>0,1] 
+
+# create a list with the upregulated transcripts from each group
+geneList2 <- list("TCR" = trans_control_vs_TCR, "INFL3" = trans_control_vs_INFL3, "TCR-INFL3" = trans_control_vs_TCR_INFL3)
+
+# plot the Venn Diagram
+ggvenn(
+  geneList2,
+  fill_color = c("#ff6e54","#ffa600","#808080"),
+  stroke_size = 0.0,
+  stroke_alpha = 0.05,
+  set_name_size = 5,
+  fill_alpha = 0.4,
+  text_size = 4
+  )
+
+
+
+```
+
+### **Downregulated Transcripts**
+
+The Venn diagrams show the intersections between the downregulated genes on TCR, INFL3 and TCR-INFL3 groups, where the base of the differential was the control group.
+
+```{r Venn diagram down,fig.width=5,fig.height=5,echo=F,include=T}
+
+
+# filter table to keep only the upregulated transcripts
+trans_control_vs_TCR <- sign_res_annotated_control_vs_TCR[sign_res_annotated_control_vs_TCR$log2FoldChange<0,1] 
+
+trans_control_vs_INFL3 <- sign_res_annotated_control_vs_INFL3[sign_res_annotated_control_vs_INFL3$log2FoldChange<0,1]   
+
+trans_control_vs_TCR_INFL3 <- sign_res_annotated_control_vs_TCR_INFL3[sign_res_annotated_control_vs_TCR_INFL3$log2FoldChange<0,1] 
+
+# create a list with the upregulated transcripts from each group
+geneList2 <- list("TCR" = trans_control_vs_TCR, "INFL3" = trans_control_vs_INFL3, "TCR-INFL3" = trans_control_vs_TCR_INFL3)
+
+# plot the Venn Diagram
+ggvenn(
+  geneList2,
+  fill_color = c("#ff6e54","#ffa600","#808080"),
+  stroke_size = 0.0,
+  stroke_alpha = 0.05,
+  set_name_size = 5,
+  fill_alpha = 0.4,
+  text_size = 4
+  )
+
+
+
+```
+
+
+
+# **Enrichment Analysis**
+
+<br>
+
+Enrichment analysis takes the list of genes that you found from RNA-seq, and then checks if these genes are linked to any particular biological pathways more than you would expect by chance. If they are, this might suggest that these pathways are involved in the conditions or states that you're studying.
+
+<br>
+
+The dot plot shows below the top 20 enriched pathways. The y-axis represents the pathways, and the x-axis represents the GeneRatio, which is the ratio of the number of significant genes in the pathway to the total number of genes in that pathway. The size of the dot corresponds to the number of genes in the gene set, and the color of the dot indicates the adjusted p-value (the redder, the more significant).
+
+<br>
+
+```{r enrichment function}
+
+enrichment <- function(up=TRUE, sign_res_annotated, my_mart){
+    
+    if(up==TRUE){
+      # filter for upregulated transcripts by log2foldchange
+      sign_res_annotated_up<- sign_res_annotated[sign_res_annotated$log2FoldChange>0,]
+      res_ordered <- sign_res_annotated_up[order(sign_res_annotated_up$padj), ] 
+      refseq_ids <- res_ordered$Transcript
+    } else {
+      # filter for downregulated transcripts by log2foldchange
+      sign_res_annotated_down<- sign_res_annotated[sign_res_annotated$log2FoldChange<0,]
+      res_ordered <- sign_res_annotated_down[order(sign_res_annotated_down$padj), ] 
+      refseq_ids <- res_ordered$Transcrip
+     }
+    
+      
+    # Convert the RefSeq IDs to Entrez IDs
+    genes <- getBM(filters = "ensembl_transcript_id",
+                   attributes = c("ensembl_transcript_id", "entrezgene_id"),
+                   values = refseq_ids,
+                   mart = my_mart)
+    
+    # Filter out IDs that couldn't be converted
+    genes <- genes[!is.na(genes$entrezgene_id), ]
+    
+    # Extract the gene IDs
+    gene_ids <- genes$entrezgene_id
+    
+    # Run KEGG enrichment analysis
+    kegg_res <- enrichKEGG(gene         = gene_ids,
+                           organism     = 'hsa', 
+                           pvalueCutoff = 0.05,
+                           qvalueCutoff = 0.1)
+    
+    return(kegg_res)
+}
+```
+
+<br>
+
+## **Upregulated Transcripts - Activated Pathways**{.tabset}
+
+<br> 
+
+Before running the analysis we filtered the differentially expressed transcripts to select only the upregulated ones between groups (log2FoldChange>0).
+
+<br>
+
+### **TCR vs Control**
+
+<br>
+
+```{r plot enrichment up control_vs_TCR}
+
+kegg_results<-enrichment(up=TRUE, sign_res_annotated_control_vs_TCR, my_mart)
+
+# Bar plot
+#barplot(kegg_results, showCategory=20)
+
+# Dot plot
+dotplot(kegg_results, showCategory=20)
+
+datatable(kegg_results@result, 
+          rownames= FALSE,
+          filter = 'top',
+          extensions = 'Buttons',
+          options = list(scrollX = TRUE,
+                         pageLength = 5,
+                         dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                         caption = "Enriched Pathways - Kegg, TCR/Control"))
+
+```
+
+<br>
+
+### **INFL3 vs Control**
+
+<br>
+
+```{r plot enrichment up control_vs_INFL3}
+
+kegg_results<-enrichment(up=TRUE, sign_res_annotated_control_vs_INFL3, my_mart)
+
+# Bar plot
+#barplot(kegg_results, showCategory=20)
+
+# Dot plot
+dotplot(kegg_results, showCategory=20)
+
+datatable(kegg_results@result, 
+          rownames= FALSE,
+          filter = 'top',
+          extensions = 'Buttons',
+          options = list(scrollX = TRUE,
+                         pageLength = 5,
+                         dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                         caption = "Activated Pathways - Kegg, INFL3/Control"))
+
+```
+
+<br>
+
+### **TCR-NFL3 vs Control**
+
+<br>
+
+```{r plot enrichment up control_vs_TCR-NFL3}
+
+kegg_results<-enrichment(up=TRUE, sign_res_annotated_control_vs_TCR_INFL3, my_mart)
+
+# Bar plot
+#barplot(kegg_results, showCategory=20)
+
+# Dot plot
+dotplot(kegg_results, showCategory=20)
+
+datatable(kegg_results@result, 
+          rownames= FALSE,
+          filter = 'top',
+          extensions = 'Buttons',
+          options = list(scrollX = TRUE,
+                         pageLength = 5,
+                         dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                         caption = "Activated Pathways - Kegg, TCR-INFL3/Control"))
+
+```
+
+
+<br>
+
+## **Downregulated Transcripts Only -Suppressed Pathways**{.tabset}
+
+<br> 
+
+Before running the analysis we filtered the differentially expressed transcripts to select only the downregulated ones between groups (log2FoldChange<0).
+
+### **TCR vs Control**
+
+<br>
+
+```{r plot enrichment down control_vs_TCR}
+
+kegg_results<-enrichment(up=FALSE, sign_res_annotated_control_vs_TCR, my_mart)
+
+# Bar plot
+#barplot(kegg_results, showCategory=20)
+
+# Dot plot
+dotplot(kegg_results, showCategory=20)
+
+datatable(kegg_results@result, 
+          rownames= FALSE,
+          filter = 'top',
+          extensions = 'Buttons',
+          options = list(scrollX = TRUE,
+                         pageLength = 5,
+                         dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                         caption = "Suppressed Pathways - Kegg, TCR/Control"))
+
+```
+
+<br>
+
+### **INFL3 vs Control**
+
+<br>
+
+```{r plot enrichment down control_vs_INFL3}
+
+kegg_results<-enrichment(up=FALSE, sign_res_annotated_control_vs_INFL3, my_mart)
+
+# Bar plot
+#barplot(kegg_results, showCategory=20)
+
+# Dot plot
+dotplot(kegg_results, showCategory=20)
+
+datatable(kegg_results@result, 
+          rownames= FALSE,
+          filter = 'top',
+          extensions = 'Buttons',
+          options = list(scrollX = TRUE,
+                         pageLength = 5,
+                         dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                         caption = "Suppressed Pathways - Kegg, INFL3/Control"))
+
+```
+
+<br>
+
+### **TCR-NFL3 vs Control**
+
+<br>
+
+```{r plot enrichment down control_vs_TCR-NFL3}
+
+kegg_results<-enrichment(up=FALSE, sign_res_annotated_control_vs_TCR_INFL3, my_mart)
+
+# Bar plot
+#barplot(kegg_results, showCategory=20)
+
+# Dot plot
+dotplot(kegg_results, showCategory=20)
+
+datatable(kegg_results@result, 
+          rownames= FALSE,
+          filter = 'top',
+          extensions = 'Buttons',
+          options = list(scrollX = TRUE,
+                         pageLength = 5,
+                         dom = 'Blfrtip',
+                         buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                         caption = "Suppressed Pathways - Kegg, TCR-INFL3/Control"))
+
+```
+
+
+
+<br>
+
+# **Heatmap of Diff. Expressed Genes**{.tabset}
+
+Heatmap of 20 upregulated/downregulated genes. The gene expression table was log-transformed and the color scale on the plot shows the associated Z-score.
+
+
+```{r heatmap function}
+
+plot_heatmap<- function(filtered_metadata,dexp,data_matrix,group_colors){
+
+  # Order the genes according to the log2foldChange and pick the top 20 downregulated
+  transcript_down20<-dexp[order(dexp$log2FoldChange),][1:20,"Transcript"]
+  # Order the genes according to the log2foldChange and pick the top 20 upregulated
+  transcript_up20<-dexp[order(dexp$log2FoldChange, decreasing = TRUE),][1:20,"Transcript"]
+  # put together all up and down regulated transcripts
+  transcripts<-c(transcript_down20,transcript_up20)
+  
+  # load the expression table and add a columns with the Transcripts
+  expr_table <- data_matrix[,colnames(data_matrix) %in% filtered_metadata$label]
+  
+  # normalization and scaling data
+  # Calculate size factor (library size) for normalization
+  sizeFactors <- DESeq2::estimateSizeFactorsForMatrix(expr_table)
+  # normalize using the size factors , simple dividing each sample by its size factor
+  norm_counts <- sweep(expr_table, 2, sizeFactors, FUN="/")
+  # do log2 transformation
+  expr_norm <- log2(norm_counts + 1)
+
+  # add a column with transcripts names
+  expr_norm <- data.frame(expr_norm) %>% mutate(Transcript=rownames(expr_norm))
+  # filtering for only the top 20 up and down regulated
+  expr_norm <- expr_norm[expr_norm$Transcript %in% transcripts, ]
+  # join the gene symbold to the expression table
+  expr_norm<-dexp[,c("Transcript","hgnc_symbol")]  %>%
+    inner_join(expr_norm, by="Transcript") %>%
+    rename(gene=hgnc_symbol)
+  # remove the Trancripts column
+  expr_norm<-expr_norm[,-1]
+  # filter for unique genes
+  expr_norm <- expr_norm[!duplicated((expr_norm$gene)),]
+  # adding row names to the expression table
+  rownames(expr_norm) <- expr_norm$gene
+  # remove the gene column and transform the table into a matrix
+  expr_norm_matrix <- as.matrix(expr_norm[,-1])
+  
+  
+  # select color for the groups
+  ann_colors = list(group = group_colors)
+  
+  # select the groups information for the figure legend
+  annotation<-data.frame(filtered_metadata$group)
+  colnames(annotation)<-"group"
+  
+  # plot heatmap with the differentially expressed genes, clustering them per sample group
+  aheatmap(expr_norm_matrix, color = rev(brewer.pal(9,"RdBu")),
+           scale="row", annColors = ann_colors, Colv = NA, annCol=annotation)  
+  
+ 
+}
+
+```
+
+<br>
+
+## **TCR vs Control**
+
+<br>
+
+```{r plot heatmap control_vs_TCR,fig.width=8,fig.height=8 }
+# filtered metadata for the groups of interest
+filtered_metadata<-metadata %>% filter(group=="01_control" | group=="02_TCR" )
+
+#load the differential expression table
+dexp<- sign_res_annotated_control_vs_TCR 
+dexp<-dexp[!is.na(dexp$hgnc_symbol),]
+
+# colors for the groups
+group_colors<-c("#003f5c","#ff6e54")
+
+#plot heatmap
+plot_heatmap(filtered_metadata,dexp,data_matrix,group_colors)
+
+```
+
+<br>
+
+## **INFL3 vs Control**
+
+<br>
+
+```{r plot heatmap control_vs_INFL3,fig.width=8,fig.height=8 }
+# filtered metadata for the groups of interest
+filtered_metadata<-metadata %>% filter(group=="01_control" | group=="03_INFL3" )
+
+#load the differential expression table
+dexp<- sign_res_annotated_control_vs_INFL3 
+dexp<-dexp[!is.na(dexp$hgnc_symbol),]
+
+# colors for the groups
+group_colors<-c("#003f5c","#ffa600")
+
+#plot heatmap
+plot_heatmap(filtered_metadata,dexp,data_matrix,group_colors)
+
+```
+
+
+<br>
+
+## **TCR-INFL3 vs Control**
+
+<br>
+
+```{r plot heatmap control_vs_TCR-INFL3,fig.width=8,fig.height=8 }
+# filtered metadata for the groups of interest
+filtered_metadata<-metadata %>% filter(group=="01_control" | group=="04_TCR-INFL3" )
+
+#load the differential expression table
+dexp<- sign_res_annotated_control_vs_TCR_INFL3 
+dexp<-dexp[!is.na(dexp$hgnc_symbol),]
+
+# colors for the groups
+group_colors<-c("#003f5c","#808080")
+
+#plot heatmap
+plot_heatmap(filtered_metadata,dexp,data_matrix,group_colors)
+
+
+
+
+print(Sys.time() - old)
+```
+
+<br>
+
+# **Differential expression analysis with edgeR**
+
+<br>
+
+Both, DESeq2 and edgeR are widely used for differential expression analysis. There are similarities and differences between them to consider.
+<br>
+* Both assume the data follows a negative bionomial distribution.<br>
+* DESeq2 is believed to generate a lower number of false positives, but edgeR offers more flexibility to define experimental designs.<br>
+* edgeR requires more careful preprocessing of count data.<br>
+* DESeq2 is a bit more friendly than edgeR. edgeR requires a better understanding of statistic and model designs<br><br>
+Often, researchers use both approaches to confirm the significance of differntially expressed features (transcripts or genes) that want to be further studied experimentally, i.e. if a transcript or gene is found differentially expressed by both approaches, the chances of that being a false positive are minimized.
+<br>
+```{r Create an edgeR object }
+library(edgeR)
+# Create a group vector from the metadata
+# Remove numbers, hyphens and underscores.
+meta_group <- gsub('\\d.+_', '', metadata$group)
+group <- gsub('-', '', meta_group)
+
+# Create a DGEList object
+dge <- DGEList(counts = data_table, group = group)
+
+# Filter by expression
+keep <- filterByExpr(dge)
+
+# Keep only transcripts deemed as informative
+dge <- dge[keep,,keep.lib.sizes=F]
+
+
+```
+
+The first step in a typical edgeR pipeline is to filter out genes that have low counts across all samples. These genes are often not useful for differential expression analysis because their low counts lead to high variability and low statistical power in detecting true differences.
+<br>
+```{r Normalize counts}
+
+# Normalize countdata
+dge <- normLibSizes(dge)
+
+```
+
+The second step is to normalized the libraries. edgeR combines the library size factors and the TMM method.<br>
+
+TMM Method: TMM normalization, which stands for Trimmed Mean of M-values, is a method developed to normalize RNA-Seq data. It adjusts for differences in library sizes and composition between RNA-Seq samples.<br>
+
+## **How TMM Works?**
+<br>
+TMM compares the read counts of each sample to a reference sample (usually the one with the median library size) to calculate a scaling factor for each sample. It does so by calculating a weighted mean of the log expression ratios (M-values) for most genes, excluding the most highly and most lowly expressed genes (hence "trimmed").The idea is to mitigate the impact of genes with extreme count values or genes that are differentially expressed when calculating the scaling factor.
+<br>
+
+As in the case of the DESeq2 pipeline, we can also visualize sample distances in a principal component analysis (PCA) plot.<br>
+
+```{r Create PCA plot}
+
+# Extract Log-transform counts
+counts <- cpm(dge, log=TRUE)  
+pca <- prcomp(t(counts))
+pca_df <- data.frame(Sample = colnames(counts), PC1 = pca$x[,1], PC2 = pca$x[,2])
+
+ggplot(pca_df, aes(x = PC1, y = PC2, label = Sample, color = group)) +
+  geom_point(size = 6) +
+  geom_text() +
+  xlab("PC1") + ylab("PC2") +
+  ggtitle("PCA Plot") +
+  theme_bw()
+```
+<br>
+
+Another useful visualization method is a dendrogram depicting hierarchical clustering. 
+<br>
+
+```{r Create HC plot}
+dist_mat <- dist(t(counts))  # Compute distance matrix
+hc <- hclust(dist_mat)  # Perform hierarchical clustering
+plot(hc)  # Plot dendrogram
+
+```
+<br>
+
+The next step is to estimate dispersion in the counts data. <br>
+
+```{r Estimate dispersion}
+
+# Define a design
+design <- model.matrix(~group)
+
+# Estimate dispersion
+dge <- estimateDisp(dge,design)
+
+```
+Dispersion refers to the variability in gene expression counts that is not explained by the mean expression level. In RNA-Seq data, even when two samples have the same mean expression level for a gene, they can have different levels of variability in those counts.<br>
+
+Overdispersion: RNA-Seq data typically exhibits overdispersion, meaning the variance is greater than the mean. Accurate estimation of dispersion is critical for reliable differential expression analysis.<br>
+
+
+## **Differential expression analysis** 
+In the dataset, we have 25 samples which belong to 5 different groups. If we want to explore the data for significance, a quasy likelihood F test can be run, as in most regression models, classification is made in two steps: Fitting and modelling.
+<br>
+To assess global differences between groups included in the experiments, the Quasi likelihood F test or a likelihood ration test (LRT) can be used.<br>
+
+Top differentially expressed transcripts when using the Quasi likelihood F test:<br>
+
+```{r Quasy likelihood F test}
+
+# Fitting the Model:
+fit <- glmQLFit(dge, design)
+
+# glmQLFTest performs quasi-likelihood F-tests to identify differentially 
+# expressed genes. fit is the fitted model object from glmQLFit.
+# coef=2 specifies which coefficient in the model should be tested. 
+# This typically corresponds to a specific condition or comparison between 
+# conditions in your experiment.
+qlf <- glmQLFTest(fit, coef=2)
+
+# Extracting the Top Genes:
+topTags(qlf)
+results <- topTags(qlf, n=Inf, adjust.method="BH", p.value=0.05)
+de.genes <- results$table
+head(de.genes)
+
+```
+<br>
+A likelyhood ratio test (LRT) can also be run.
+<br>
+Top differentially expressed transcripts when using the likelihood ratio test (LRT).<br>
+
+```{r LRT}
+# Likelihood Ratio Tests
+# Fitting the Model:
+# glmFit fits a generalized linear model using a negative binomial distribution, 
+# which is a common approach for RNA-Seq data. The parameters y and design have 
+# the same meaning as in the quasi-likelihood method.
+fit <- glmFit(dge, design)
+
+# glmLRT performs likelihood ratio tests, another method for identifying 
+# differentially expressed genes. It compares two models: one that includes 
+# the effect (e.g., treatment condition) and one that does not.
+# coef=2 specifies the coefficient representing the effect being tested.
+lrt <- glmLRT(fit, coef=2)
+
+# Extracting the Top Genes:
+topTags(lrt)
+results <- topTags(lrt, n=Inf, adjust.method="BH", p.value=0.05)
+de.genes <- results$table
+head(de.genes)
+
+
+```
+Both methods, QLT and LRT, are used for identifying differentially expressed genes in RNA-Seq data, but they use different statistical approaches. Quasi-likelihood F-tests provide robustness against overdispersion and are generally more conservative. Likelihood ratio tests are another powerful method, especially useful in complex experimental designs.
+<br><br>
+More often, however, we are interested in pairwise comparisons. For example, a control against an experimental group, a healthy against a diseased group, etc. For those cases we generate a list of contrast using the function 'makeContrasts' from the package 'limma'.
+<br><br>
+Top DE transcripts between the Control group and the TCR group.<br>
+```{r Create contrasts}
+library(limma)
+
+contrast.matrix <- makeContrasts(
+  vsgroupINFL3 = groupINFL3,  # Compared to groupcontrol (implicit baseline)
+  vsgroupTCR = groupTCR,      # Compared to groupcontrol
+  vsgroupTCRINFL3 = groupTCRINFL3,  # Compared to groupcontrol
+  levels = design
+)
+
+# Fit model
+fit <- glmQLFit(dge, design)
+# Run the model including the contrast matrix for specific comparisons
+qlf <- glmQLFTest(fit, contrast=contrast.matrix)
+
+# Run first contrast
+qlf.vsgroupTCR <- glmQLFTest(fit, contrast=contrast.matrix[,"vsgroupTCR"])
+res.vsgroupTCR <- topTags(qlf.vsgroupTCR, n=Inf, adjust.method="BH", p.value=0.05)
+de.genes.vsgroupTCR <- res.vsgroupTCR$table
+nrow(de.genes.vsgroupTCR)
+head(de.genes.vsgroupTCR)
+
+```
+Top DE transcripts between the Control group and the INFL3 group.<br>
+
+```{r Second contrast}
+# Run second contrast
+qlf.vsgroupINFL3 <- glmQLFTest(fit, contrast=contrast.matrix[,"vsgroupINFL3"])
+res.vsgroupINFL3 <- topTags(qlf.vsgroupINFL3, n=Inf, adjust.method="BH", p.value=0.05)
+de.genes.vsgroupINFL3 <- res.vsgroupINFL3$table
+nrow(de.genes.vsgroupINFL3)
+head(de.genes.vsgroupINFL3)
+```
+
+Top DE transcripts between the Control group and the TCR-INFL3 group.<br>
+```{r Third contrast}
+# Rub tge third contrast
+qlf.vsgroupTCRINFL3 <- glmQLFTest(fit, contrast=contrast.matrix[,"vsgroupTCRINFL3"])
+res.vsgroupTCRINFL3 <- topTags(qlf.vsgroupTCRINFL3, n=Inf, adjust.method="BH", p.value=0.05)
+de.genes.vsgroupTCRINFL3 <- res.vsgroupTCRINFL3$table
+nrow(de.genes.vsgroupTCRINFL3)
+head(de.genes.vsgroupTCRINFL3)
+
+```
