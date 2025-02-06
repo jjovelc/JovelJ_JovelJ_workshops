@@ -1,6 +1,6 @@
 # High quality figures in Adobe Illustrator
 
-## Please insteall Illustrator yourself
+## Please install Illustrator yourself
 
 Licenses require approval from the person’s reports-to manager, or in the case of graduate students their supervisor. This approval is done through theIT ServiceNow platform, so please follow these steps:
  
