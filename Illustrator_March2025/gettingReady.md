@@ -20,7 +20,7 @@ Licenses require approval from the person’s reports-to manager, or in the case
 
 “Do you require an alternate version of the software” enter “No”
 
-“Please describe the type of computer this software is for” enter “Single computer (personally owned or university owned)” [note: enter this even if it’s a shared/lab computer, or the license won’t get provisioned correctly]
+“Please describe the type of computer this software will be used in” enter “Single computer (personally owned or university owned)” [note: enter this even if it’s a shared/lab computer, or the license won’t get provisioned correctly]
 
 7. Click “add to cart” at the bottom of the page
 
