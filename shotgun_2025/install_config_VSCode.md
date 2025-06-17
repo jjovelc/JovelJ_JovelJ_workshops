@@ -65,24 +65,6 @@ Install these extensions for optimal HPC experience:
    - Extension ID: `ms-vscode-remote.remote-ssh-edit`
    - Helps edit SSH configuration files
 
-### Recommended Extensions
-
-3. **Remote Explorer**
-   - Usually comes with Remote SSH
-   - Provides GUI for managing remote connections
-
-4. **Python** (if you work with Python)
-   - Extension ID: `ms-python.python`
-   - Full Python support with IntelliSense
-
-5. **Jupyter** (for notebook support)
-   - Extension ID: `ms-toolsai.jupyter`
-   - Run Jupyter notebooks remotely
-
-6. **GitLens** (for Git integration)
-   - Extension ID: `eamodio.gitlens`
-   - Enhanced Git capabilities
-
 ## Setting Up SSH Keys
 
 SSH keys provide secure, password-free authentication to your HPC system.
@@ -101,7 +83,7 @@ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 
 **During key generation:**
 - Press Enter for default file location (`~/.ssh/id_rsa`)
-- Enter a secure passphrase (optional but recommended)
+- Enter a secure passphrase (leave it empty; just press enter)
 - Press Enter to confirm passphrase
 
 ### Copy Public Key to HPC

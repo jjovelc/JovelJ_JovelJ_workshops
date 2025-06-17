@@ -5,5 +5,6 @@ Hereafter, some basic instructions to get ready for the workshop are linked. If 
 ## Table of content
 
 1. [Install and config VSCode](install_config_VSCode.md)
+2. [Basic Linux tutorial](https://www.juanjovel.ca/blogs/HPC_tutorial.html)
 
 
