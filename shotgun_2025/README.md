@@ -12,4 +12,6 @@ In two intensive days, you'll transform from data-overwhelmed to analysis-confid
 
 Whether you're tracking antibiotic resistance, exploring the human microbiome, or searching for novel enzymes, this workshop equips you with the computational arsenal to extract meaning from metagenomic complexity.
 
+[Prepare for workshop](gettingReady.md)
+
 [More details here](https://www.juanjovel.ca/workshops/shotgun_2025/shotgun.html)
