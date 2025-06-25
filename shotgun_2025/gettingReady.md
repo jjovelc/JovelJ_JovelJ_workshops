@@ -11,7 +11,6 @@ This document provides basic instructions to help you prepare for the upcoming w
 5. [Basic Linux Tutorial (optional)](https://www.juanjovel.ca/blogs/HPC_tutorial.html)
 6. [Basic R Tutorial (optional)](https://www.juanjovel.ca/blogs/R_tutorial.html)
 
-You are welcome to explore any Linux or R tutorials you prefer. While we will introduce key concepts and commands during the workshop, prior exposure will be helpful.
 
 ---
 ## Get an ARC Account
