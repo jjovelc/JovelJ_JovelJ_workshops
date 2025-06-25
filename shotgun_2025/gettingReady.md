@@ -95,6 +95,8 @@ After completing these steps, Mamba should be installed and ready to use. You ca
 
 ## Setting Up R in VSCode
 
+After installing VSCode, following the instructions provided [here](install_config_VSCode.md), please proceed to install R and configure it in VSCode.
+
 ### 📦 1. Install R
 
 🔹 On macOS (via Homebrew)
