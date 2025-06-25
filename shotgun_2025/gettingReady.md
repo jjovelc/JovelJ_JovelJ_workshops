@@ -5,6 +5,7 @@ This document provides basic instructions to help you prepare for the upcoming w
 ## Table of Contents
 
 1. [Get an ARC Account](#get-an-arc-account)
+2. [Install mamba in ARC](#install-mamba-in-arc)
 2. [Install and Configure VSCode](install_config_VSCode.md)
 3. [Basic Linux Tutorial (optional)](https://www.juanjovel.ca/blogs/HPC_tutorial.html)
 4. [Basic R Tutorial (optional)](https://www.juanjovel.ca/blogs/R_tutorial.html)
@@ -12,6 +13,9 @@ This document provides basic instructions to help you prepare for the upcoming w
 You are welcome to explore any Linux or R tutorials you prefer. While we will introduce key concepts and commands during the workshop, prior exposure will be helpful.
 
 ---
+
+## Install mamba in ARC
+
 
 ## Get an ARC Account
 
