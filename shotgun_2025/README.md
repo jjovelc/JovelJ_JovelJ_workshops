@@ -15,3 +15,7 @@ Whether you're tracking antibiotic resistance, exploring the human microbiome, o
 [Prepare for workshop](gettingReady.md)
 
 [More details here](https://www.juanjovel.ca/workshops/shotgun_2025/shotgun.html)
+
+[Find workshop room](https://www.youtube.com/watch?v=2WR6wpuc1sk)
+
+
