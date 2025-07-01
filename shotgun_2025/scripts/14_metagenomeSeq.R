@@ -19,12 +19,12 @@ library(RColorBrewer)
 library(pheatmap)
 
 # ===== DATA LOADING ===== #
-buffalo <- loadMeta("inflammation_all_samples_kraken2-counts.tsv")
+mouse <- loadMeta("inflammation_all_samples_kraken2-counts.tsv")
 meta <- loadPhenoData("metadata.txt", tran = TRUE)
 
 # Get the counts and taxa
-counts_matrix <- buffalo$counts
-taxa_data     <- buffalo$taxa
+counts_matrix <- mouse$counts
+taxa_data     <- mouse$taxa
 
 # Ensure consistent naming
 sample_names <- colnames(counts_matrix)
@@ -45,77 +45,77 @@ inflammData <- AnnotatedDataFrame(meta)
 featureData <- AnnotatedDataFrame(taxa_data)
 
 # Create MRexperiment object
-buffaloMR <- newMRexperiment(
+mouseMR <- newMRexperiment(
   counts = counts_matrix,
   phenoData = inflammData,
   featureData = featureData
 )
 
 print("MRexperiment object created successfully!")
-print(buffaloMR)
+print(mouseMR)
 
 # ===== DATA EXPLORATION ===== #
 # Basic statistics
 cat("\n === BASIC DATA SUMMARY ===\n")
-cat("Number of features:", nrow(buffaloMR), "\n")
-cat("Number of samples:", ncol(buffaloMR), "\n")
+cat("Number of features:", nrow(mouseMR), "\n")
+cat("Number of samples:", ncol(mouseMR), "\n")
 
 # Check sparsity
-sparsity <- sum(MRcounts(buffaloMR) == 0) / (nrow(MRcounts(buffaloMR)) * ncol(MRcounts(buffaloMR)))
+sparsity <- sum(MRcounts(mouseMR) == 0) / (nrow(MRcounts(mouseMR)) * ncol(MRcounts(mouseMR)))
 cat("Data sparsity:", round(sparsity * 100, 2), "%\n")
 
 # ===== FILTERING ===== #
 # Filter low abundance features
 # Keep features present in at least 2 samples with at least 2 counts
 # filterData returns the filtered MRexperiment object directly
-buffaloMR_filtered <- filterData(buffaloMR, present = 2, depth = 2)
+mouseMR_filtered <- filterData(mouseMR, present = 2, depth = 2)
 
-cat("Original features:", nrow(buffaloMR), "\n")
-cat("Features after filtering:", nrow(buffaloMR_filtered), "\n")
+cat("Original features:", nrow(mouseMR), "\n")
+cat("Features after filtering:", nrow(mouseMR_filtered), "\n")
 
 # If you want to see which features were kept, you can compare:
-original_features <- rownames(MRcounts(buffaloMR))
-filtered_features <- rownames(MRcounts(buffaloMR_filtered))
+original_features <- rownames(MRcounts(mouseMR))
+filtered_features <- rownames(MRcounts(mouseMR_filtered))
 
 cat("Features removed:", length(original_features) - length(filtered_features), "\n")
 
 # Check if filtering worked
-if (nrow(buffaloMR_filtered) > 0) {
+if (nrow(mouseMR_filtered) > 0) {
   cat("Filtering successful!\n")
 } else {
   cat("No features passed the filter, trying less stringent criteria...\n")
   # Try more lenient filtering
-  buffaloMR_filtered <- filterData(buffaloMR, present = 2, depth = 1)
-  cat("Features with present=2, depth=1:", nrow(buffaloMR_filtered), "\n")
+  mouseMR_filtered <- filterData(mouseMR, present = 2, depth = 1)
+  cat("Features with present=2, depth=1:", nrow(mouseMR_filtered), "\n")
 }
 
 cat("\n=== AFTER FILTERING ===\n")
-cat("Features remaining:", nrow(buffaloMR_filtered), "\n")
-cat("Samples remaining:", ncol(buffaloMR_filtered), "\n")
+cat("Features remaining:", nrow(mouseMR_filtered), "\n")
+cat("Samples remaining:", ncol(mouseMR_filtered), "\n")
 
 # ===== NORMALIZATION =====
 # Calculate normalization factors using Cumulative Sum Scaling (CSS)
-buffaloMR_filtered <- cumNorm(buffaloMR_filtered, p = cumNormStatFast(buffaloMR_filtered))
+mouseMR_filtered <- cumNorm(mouseMR_filtered, p = cumNormStatFast(mouseMR_filtered))
 
 # Get normalized counts
-normalized_counts <- MRcounts(buffaloMR_filtered, norm = TRUE, log = TRUE)
+normalized_counts <- MRcounts(mouseMR_filtered, norm = TRUE, log = TRUE)
 
 cat("\n=== NORMALIZATION COMPLETE ===\n")
 cat("Normalization factors:\n")
-print(normFactors(buffaloMR_filtered))
+print(normFactors(mouseMR_filtered))
 
 # ===== STATISTICAL ANALYSIS =====
 # Set up the model for differential abundance testing
 # Using group as the main factor
-mod <- model.matrix(~group, data = pData(buffaloMR_filtered))
+mod <- model.matrix(~group, data = pData(mouseMR_filtered))
 settings <- zigControl()
 
 # Perform zero-inflated Gaussian model fitting
-buffaloFit <- fitZig(obj = buffaloMR_filtered, mod = mod, control = settings)
+mouseFit <- fitZig(obj = mouseMR_filtered, mod = mod, control = settings)
 cat("\n=== MODEL FITTING COMPLETE ===\n")
 
 # Extract results
-zigResults <- MRcoefs(buffaloFit, by = 2, coef = 2)
+zigResults <- MRcoefs(mouseFit, by = 2, coef = 2)
 
 # Check the structure of zigResults
 cat("Column names in zigResults:\n")
@@ -156,7 +156,7 @@ pca_data <- prcomp(t(normalized_counts), scale. = TRUE)
 pca_df <- data.frame(
   PC1 = pca_data$x[, 1],
   PC2 = pca_data$x[, 2],
-  Group = pData(buffaloMR_filtered)$group,
+  Group = pData(mouseMR_filtered)$group,
   Sample = rownames(pca_data$x)
 )
 
@@ -183,7 +183,7 @@ top_var_data <- normalized_counts[top_var_indices, ]
 
 # Create annotation for samples
 annotation_col <- data.frame(
-  Group = pData(buffaloMR_filtered)$group,
+  Group = pData(mouseMR_filtered)$group,
   row.names = colnames(top_var_data)
 )
 
@@ -328,7 +328,7 @@ if (exists("significant_results") && nrow(significant_results) > 0) {
     plot_data[[i]] <- data.frame(
       Sample = names(feature_counts),
       Count = as.numeric(feature_counts),
-      Group = pData(buffaloMR_filtered)$group,
+      Group = pData(mouseMR_filtered)$group,
       Feature = paste0(
         "Feature_", i, ": ",
         substr(taxa_data[top_features[i], "taxa"], 1, 30)
