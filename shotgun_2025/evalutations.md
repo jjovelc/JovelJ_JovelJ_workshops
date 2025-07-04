@@ -29,7 +29,7 @@ See above. Someone should run through all scripts ahead of time so as not to was
 #### On a scale of 1-10 how do you rate this course?
 7
 #### What is your general impression of the workshop?
--
+Did not answer.
 #### Any suggestion for improvement?
 - Having the slides before the course would be great. Then is it easy to double-check information while working in the terminal.
 - The pace seemed a bit slow at the beginning (though troubleshooting is important) and then rushed at the end.
@@ -105,7 +105,7 @@ It was very helpful in many ways.
 #### Any suggestion for improvement?
 Maybe better organization
 
-## Consolidaitons of evaluations by chatGPT
+## Consolidation of evaluations by chatGPT
 
 ### Strengths Noted by Participants
 
