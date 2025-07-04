@@ -1,16 +1,12 @@
 #!/usr/bin/bash
 
-
-#SBATCH --partition=synergy,cpu2019,cpu2021,cpu2022,cpu2023
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=20
+#SBATCH --cpus-per-task=48
 #SBATCH --time=7-00:00:00
-#SBATCH --mem=200G
+#SBATCH --mem=128G
 #SBATCH --output=logs/annotation_sbatch_job.%A.out
 #SBATCH --error=logs/annotation_sbatch_job.%A.err
-
-
 
 echo "Started at: `date`" && echo -e "\n"
 
@@ -37,7 +33,7 @@ Bracken_DIR="$(pwd)/output/06_bracken2"
 mkdir -p "${Kraken_DIR}"
 
 # Path to the kraken2 database (modify accordingly)
-DB="/bulk/IMCshared_bulk/sbagheri/workshops/spring_workshop_2025/final_files/kraken2_NCBI_Oct22"
+DB="/work/vetmed_shared_dbs/kraken2_dbs/kraken2_NCBI_Oct22/"
 
 
 echo -e "\n\n****** First Kraken step to produce files with mpa.tax suffix ******\n\n"
@@ -138,7 +134,6 @@ Kraken_bracken_figures="$(pwd)/output/06_Kr-Br-html_reports"
 
 # Ensure output directory exists
 mkdir -p "${Kraken_bracken_figures}"
-
 
 ## Run kreport2krona.py
 for sample in "${Bracken_DIR}"/*bckrpt; do kreport2krona.py -r $sample -o ${sample/.bckrpt/_krona.txt} --no-intermediate-ranks; done

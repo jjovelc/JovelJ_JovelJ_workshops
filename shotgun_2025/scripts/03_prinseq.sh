@@ -1,12 +1,11 @@
 #!/usr/bin/bash
 
 
-#SBATCH --partition=synergy,cpu2019,cpu2021,cpu2022,cpu2023
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
 #SBATCH --time=7-00:00:00
-#SBATCH --mem=200G
+#SBATCH --mem=4G
 #SBATCH --output=logs/prinseq_sbatch_job.%A.out
 #SBATCH --error=logs/prinseq_sbatch_job.%A.err
 

@@ -1,12 +1,11 @@
 #!/usr/bin/bash
 
 
-#SBATCH --partition=synergy,cpu2019,cpu2021,cpu2022,cpu2023
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=20
+#SBATCH --cpus-per-task=4
 #SBATCH --time=7-00:00:00
-#SBATCH --mem=200G
+#SBATCH --mem=4G
 #SBATCH --output=logs/QC_bmtagged_sbatch_job.%A.out
 #SBATCH --error=logs/QC_bmtagged_sbatch_job.%A.err
 
@@ -71,6 +70,8 @@ bmtagger_multiqc_dir="$(pwd)/output/05_bmtagger_multiqc"
 
 
 mkdir -p ${bmtagger_multiqc_dir}
+
+conda activate multiqc
 
 ### Running multiQC
 multiqc -f ${bmtagger_fastqc_dir} -o ${bmtagger_multiqc_dir} -n multiqc_report.html

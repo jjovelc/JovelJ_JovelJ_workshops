@@ -1,11 +1,10 @@
 #!/usr/bin/bash
 
-#SBATCH --partition=synergy,cpu2019
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
 #SBATCH --time=7-00:00:00
-#SBATCH --mem=200G
+#SBATCH --mem=4G
 #SBATCH --output=logs/cutadapt_sbatch_job.%A.out
 #SBATCH --error=logs/cutadapt_sbatch_job.%A.err
 
@@ -26,7 +25,7 @@ maxn=15
 cpus=7
 
 # Define directories and filename parts
-data_dir="/work/vetmed_shared_dbs/shotgun_workshop_2025/shotgun_inflammation_libraries/100K/"
+data_dir="/work/vetmed_shared_dbs/shotgun_workshop_2025/data/"
 forward_reads="_R1_100K.fq"
 reverse_reads="_R2_100K.fq"
 cutadapt_out_dir="$(pwd)/output/02_cutadapt"

@@ -4,7 +4,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=6
 #SBATCH --time=0-10:00:00
-#SBATCH --mem=35G
+#SBATCH --mem=32G
 #SBATCH --error=logs/humann_run.%J.err
 #SBATCH --output=logs/humann_run.%J.out
 #SBATCH --array=0-9 # job array index
@@ -18,7 +18,7 @@ conda activate shotgun2025
 bmtagger_out_dir="$(pwd)/output/04_bmtagger/"
 
 # Path to the humann database (modify accordingly)
-DB="/bulk/IMCbinf_bulk/sbagheri/Projects_IMC/databases/metannotate/humann3.9"
+DB="/work/vetmed_shared_dbs/humann3_dbs"
 
 threads=20
 nuc_db="${DB}/chocophlan"
@@ -29,7 +29,7 @@ forward_reads="_bmtagged_1.fastq"
 reverse_reads="_bmtagged_2.fastq"
 
 ####### Merging reads #######
-names=($(cat $(pwd)/names.txt))
+names=$(for FILE in *_R1_100K.fq; do echo "${FILE/_R1_100K.fq/}"; done)
 
 
 SAMPLE=${names[${SLURM_ARRAY_TASK_ID}]}
@@ -49,8 +49,6 @@ input2="${bmtagger_out_dir}/${SAMPLE}${reverse_reads}"
 
 output="${merged_dir}/${SAMPLE}_merged.fastq"
 cat ${input1} ${input2} > ${output}
-
-
 
 echo "All samples were merged"
 

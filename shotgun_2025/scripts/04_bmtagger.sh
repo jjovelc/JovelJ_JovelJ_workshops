@@ -1,14 +1,12 @@
 #!/usr/bin/bash
 
-#SBATCH --partition=synergy,cpu2019,cpu2021,cpu2022,cpu2023
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
 #SBATCH --time=7-00:00:00
-#SBATCH --mem=200G
+#SBATCH --mem=24G
 #SBATCH --output=logs/bmtagger_sbatch_job.%A.out
 #SBATCH --error=logs/bmtagger_sbatch_job.%A.err
-
 
 #Innitalize conda
 conda init bash &> /dev/null
@@ -16,19 +14,17 @@ conda init bash &> /dev/null
 #refresh shell environment after conda init
 source ~/.bashrc &> /dev/null
 
-
 echo "Started at: `date`" && echo -e "\n"
-
 
 conda activate shotgun2025
 
+shotgun_dir="/work/vetmed_shared_dbs/shotgun_workshop_2025"
 
 # Index for bmfilter (part of bmtagger), bitmask file
-bmfilter_ref="$(pwd)/bmtagger_DB/mice_reference.bitmask"
+bmfilter_ref="${shotgun_dir}/bmtagger_DB/mice_reference.bitmask"
 
 # Index for srprism (part of bmtagger)
-srprism_ref="$(pwd)/bmtagger_DB/mice_reference.srprism"
-
+srprism_ref="${shotgun_dir}/bmtagger_DB/mice_reference.srprism"
 
 prinseq_out_dir="$(pwd)/output/03_prinseq"
 forward_reads="_filtered_1.fastq"
