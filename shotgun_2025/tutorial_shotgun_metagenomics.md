@@ -100,13 +100,17 @@ squeue -u $USER
 ls output/01_raw_fastqc/
 ls output/01_raw_multiqc/
 ```
-![fastqc and multiqc results](images/01_fastqc_multiqc_results.png)
 
-\
 ### Expected Output
+
 - Individual FastQC reports for each sample
 - Aggregated MultiQC report showing quality metrics across all samples
 - HTML report viewable in web browser
+
+Figure 1. Typical fastqc and multiqc results files.
+
+![fastqc and multiqc results](images/01_fastqc_multiqc_results.png)
+
 
 ---
 
