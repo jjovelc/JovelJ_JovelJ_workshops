@@ -84,7 +84,7 @@ cp /work/vetmed_shared_dbs/shotgun_workshop_2025/scripts/* ./scripts/
 ### Purpose
 Assess the quality of raw sequencing reads to identify potential issues before processing.
 
-### Script: `01_raw_fastqc_multiqc.sh`
+###### Script: `01_raw_fastqc_multiqc.sh`
 
 ### How to Run
 
@@ -111,6 +111,11 @@ Figure 1. Typical fastqc and multiqc results files.
 
 ![fastqc and multiqc results](images/01_fastqc_multiqc_results.png)
 
+If you don't get the expected results, you can inspect the corresponding log files.
+
+Figure 2. Log files corresponding to the run of fastqc and multiqc.
+
+![fastqc and multiqc log files](images/01_logFiles_fastqc_multiqc.png)
 
 ---
 
@@ -119,98 +124,7 @@ Figure 1. Typical fastqc and multiqc results files.
 ### Purpose
 Remove sequencing adapters and perform quality trimming to improve data quality.
 
-### Script: `02_cutadapt.sh`
-
-```bash
-#!/usr/bin/bash
-
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=20
-#SBATCH --time=7-00:00:00
-#SBATCH --mem=4G
-#SBATCH --output=logs/cutadapt_sbatch_job.%A.out
-#SBATCH --error=logs/cutadapt_sbatch_job.%A.err
-
-# Initialize conda
-conda init bash &> /dev/null
-source ~/.bashrc &> /dev/null
-
-echo "Starting adapter removal with Cutadapt..."
-echo "Started at: `date`"
-
-conda activate shotgun2025
-
-# Parameters
-minlength=60
-maxn=15
-cpus=7
-
-# Define directories
-data_dir="./data/"
-forward_reads="_R1_100K.fq"
-reverse_reads="_R2_100K.fq"
-cutadapt_out_dir="$(pwd)/output/02_cutadapt"
-
-mkdir -p ${cutadapt_out_dir}
-
-# Loop over forward read files
-for file in "${data_dir}"/*"${forward_reads}"; do
-    filename=$(basename "${file}")
-    sample_name="${filename%${forward_reads}}"
-
-    echo "Processing sample: ${sample_name}"
-
-    # Construct file paths
-    input1="${data_dir}/${sample_name}${forward_reads}"
-    input2="${data_dir}/${sample_name}${reverse_reads}"
-    output1="${cutadapt_out_dir}/${sample_name}_trimmed_R1.fq"
-    output2="${cutadapt_out_dir}/${sample_name}_trimmed_R2.fq"
-
-    echo "Input1: ${input1}"
-    echo "Input2: ${input2}"
-    echo "Output1: ${output1}"
-    echo "Output2: ${output2}"
-
-    # Run Cutadapt for adapter removal
-    cutadapt -O 19 -e 0.15 -m ${minlength} --max-n ${maxn} \
-        -g TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG \
-        -G GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG \
-        -j ${cpus} -o ${output1} -p ${output2} ${input1} ${input2}
-done
-
-echo "Adapter removal finished at: `date`"
-
-# Quality trimming step
-echo "Starting quality trimming..."
-
-cutadapt_Qtrim_dir="$(pwd)/output/02_cutadaptQC"
-forward_reads="_trimmed_R1.fq"
-reverse_reads="_trimmed_R2.fq"
-
-mkdir -p ${cutadapt_Qtrim_dir}
-
-# Loop over trimmed files for quality trimming
-for file in "${cutadapt_out_dir}"/*"${forward_reads}"; do
-    filename=$(basename "${file}")
-    sample_name="${filename%${forward_reads}}"
-
-    echo "Quality trimming sample: ${sample_name}"
-
-    # Construct file paths
-    input1="${cutadapt_out_dir}/${sample_name}${forward_reads}"
-    input2="${cutadapt_out_dir}/${sample_name}${reverse_reads}"
-    output1="${cutadapt_Qtrim_dir}/${sample_name}${forward_reads}"
-    output2="${cutadapt_Qtrim_dir}/${sample_name}${reverse_reads}"
-
-    # Run quality trimming
-    cutadapt --nextseq-trim=20 --poly-a -m ${minlength} \
-        -o ${output1} -p ${output2} ${input1} ${input2}
-done
-
-echo "All samples processed."
-echo "Quality trimming finished at: `date`"
-```
+###### Script: `02_cutadapt.sh`
 
 ### How to Run
 
@@ -222,13 +136,6 @@ sbatch scripts/02_cutadapt.sh
 tail -f logs/cutadapt_sbatch_job.*.out
 ```
 
-### Parameters Explained
-- `-O 19`: Minimum overlap between adapter and read
-- `-e 0.15`: Maximum error rate (15%)
-- `-m 60`: Minimum read length after trimming
-- `--max-n 15`: Maximum number of N bases allowed
-- `--nextseq-trim=20`: Quality trimming from 3' end
-
 ---
 
 ## Step 3: Low Complexity Filtering
@@ -236,175 +143,28 @@ tail -f logs/cutadapt_sbatch_job.*.out
 ### Purpose
 Remove low-complexity sequences and apply additional quality filters using Prinseq.
 
-### Script: `03_prinseq.sh`
-
-```bash
-#!/usr/bin/bash
-
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=20
-#SBATCH --time=7-00:00:00
-#SBATCH --mem=4G
-#SBATCH --output=logs/prinseq_sbatch_job.%A.out
-#SBATCH --error=logs/prinseq_sbatch_job.%A.err
-
-# Initialize conda
-conda init bash &> /dev/null
-source ~/.bashrc &> /dev/null
-
-echo "Starting Prinseq filtering..."
-echo "Started at: `date`"
-
-conda activate shotgun2025
-
-# Input directory
-cutadapt_Qtrim_dir="$(pwd)/output/02_cutadaptQC"
-forward_reads="_trimmed_R1.fq"
-reverse_reads="_trimmed_R2.fq"
-prinseq_out_dir="$(pwd)/output/03_prinseq"
-
-mkdir -p ${prinseq_out_dir}
-
-# Prinseq parameters
-lc_method="dust"
-lc_threshold=7
-minlength=60
-maxn=15
-
-# Loop over quality-trimmed files
-for file in ${cutadapt_Qtrim_dir}/*${forward_reads}; do
-    filename=$(basename "${file}")
-    sample_name="${filename%${forward_reads}}"
-
-    echo "Processing sample: ${sample_name}"
-
-    # Construct file paths
-    input1="${cutadapt_Qtrim_dir}/${sample_name}${forward_reads}"
-    input2="${cutadapt_Qtrim_dir}/${sample_name}${reverse_reads}"
-    output="${prinseq_out_dir}/${sample_name}_filtered"
-
-    echo "-------------------------------------"
-    echo "Sample:      ${sample_name}"
-    echo "Forward:     ${input1}"
-    echo "Reverse:     ${input2}"
-    echo "-------------------------------------"
-
-    # Run Prinseq
-    perl $(pwd)/scripts/prinseq-lite.pl -fastq ${input1} -fastq2 ${input2} \
-        -out_good ${output} -out_bad null \
-        -lc_method ${lc_method} -lc_threshold ${lc_threshold} \
-        -derep 1 -min_len ${minlength} -ns_max_n ${maxn}
-
-    echo "Prinseq finished for sample: ${sample_name}"
-    echo
-done
-
-echo "All samples processed."
-echo "Script finished at: `date`"
-```
+###### Script: `03_prinseq.sh`
 
 ### How to Run
 
 ```bash
-# Make sure prinseq-lite.pl is in scripts directory
-cp prinseq-lite.pl scripts/
+# Make sure prinseq-lite.pl is in the scripts directory
 
 # Submit job
 sbatch scripts/03_prinseq.sh
 ```
-
-### Parameters Explained
-- `lc_method dust`: Low complexity detection method
-- `lc_threshold 7`: Threshold for complexity filtering
-- `derep 1`: Remove exact duplicates
-- `min_len 60`: Minimum sequence length
-- `ns_max_n 15`: Maximum N bases allowed
-
 ---
 
 ## Step 4: Host DNA Removal
 
 ### Purpose
-Remove host contamination from microbiome samples using BMTagger.
+Remove host contamination (mouse reads) from microbiome samples using BMTagger.
 
-### Script: `04_bmtagger.sh`
-
-```bash
-#!/usr/bin/bash
-
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=20
-#SBATCH --time=7-00:00:00
-#SBATCH --mem=24G
-#SBATCH --output=logs/bmtagger_sbatch_job.%A.out
-#SBATCH --error=logs/bmtagger_sbatch_job.%A.err
-
-# Initialize conda
-conda init bash &> /dev/null
-source ~/.bashrc &> /dev/null
-
-echo "Starting host removal with BMTagger..."
-echo "Started at: `date`"
-
-conda activate shotgun2025
-
-shotgun_dir="/work/vetmed_shared_dbs/shotgun_workshop_2025"
-
-# BMTagger database paths
-bmfilter_ref="${shotgun_dir}/bmtagger_DB/mice_reference.bitmask"
-srprism_ref="${shotgun_dir}/bmtagger_DB/mice_reference.srprism"
-
-# Input/output directories
-prinseq_out_dir="$(pwd)/output/03_prinseq"
-forward_reads="_filtered_1.fastq"
-reverse_reads="_filtered_2.fastq"
-bmtagger_out_dir="$(pwd)/output/04_bmtagger"
-
-mkdir -p ${bmtagger_out_dir}
-
-# Loop over filtered files
-for file in ${prinseq_out_dir}/*${forward_reads}; do
-    filename=$(basename "${file}")
-    sample_name="${filename%${forward_reads}}"
-
-    echo "Processing sample: ${sample_name}"
-
-    # Construct file paths
-    input1="${prinseq_out_dir}/${sample_name}${forward_reads}"
-    input2="${prinseq_out_dir}/${sample_name}${reverse_reads}"
-    output="${bmtagger_out_dir}/${sample_name}_bmtagged"
-
-    echo "-------------------------------------"
-    echo "Sample:      ${sample_name}"
-    echo "Forward:     ${input1}"
-    echo "Reverse:     ${input2}"
-    echo "Output:      ${output}"
-    echo "-------------------------------------"
-
-    # Run BMTagger
-    bmtagger.sh \
-        -b "${bmfilter_ref}" \
-        -x "${srprism_ref}" \
-        -q 1 \
-        -1 "${input1}" \
-        -2 "${input2}" \
-        -o "${output}" \
-        -X
-
-    echo "BMTagger finished for sample: ${sample_name}"
-    echo
-done
-
-echo "All samples processed."
-echo "Script finished at: `date`"
-```
+###### Script: `04_bmtagger.sh`
 
 ### How to Run
 
 ```bash
-# Note: Requires BMTagger database - update paths as needed
 sbatch scripts/04_bmtagger.sh
 ```
 
