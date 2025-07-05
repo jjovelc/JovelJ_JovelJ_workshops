@@ -100,7 +100,7 @@ squeue -u $USER
 ls output/01_raw_fastqc/
 ls output/01_raw_multiqc/
 ```
-[fastqc and multiqc results](images/01_fastqc_multiqc_results.png)
+![fastqc and multiqc results](images/01_fastqc_multiqc_results.png)
 
 \
 ### Expected Output
