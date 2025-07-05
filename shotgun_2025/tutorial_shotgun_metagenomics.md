@@ -180,72 +180,15 @@ BMTagger requires pre-built host reference databases. For mouse samples, you nee
 ### Purpose
 Assess data quality after host removal to ensure successful filtering.
 
-### Script: `05_bmtagger_fastqc_multiqc.sh`
-
-```bash
-#!/usr/bin/bash
-
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
-#SBATCH --time=7-00:00:00
-#SBATCH --mem=4G
-#SBATCH --output=logs/QC_bmtagged_sbatch_job.%A.out
-#SBATCH --error=logs/QC_bmtagged_sbatch_job.%A.err
-
-# Initialize conda
-conda init bash &> /dev/null
-source ~/.bashrc &> /dev/null
-
-echo "Starting post-BMTagger quality control..."
-echo "Started at: `date`"
-
-conda activate shotgun2025
-
-# Input directory
-bmtagger_out_dir="$(pwd)/output/04_bmtagger/"
-forward_reads="_bmtagged_1.fastq"
-reverse_reads="_bmtagged_2.fastq"
-bmtagger_fastqc_dir="$(pwd)/output/05_bmtagger_fastqc/"
-
-mkdir -p ${bmtagger_fastqc_dir}
-
-# Run FastQC on BMTagger output
-for sample in "${bmtagger_out_dir}"/*"$forward_reads"; do
-    SAMPLE=$(basename "${sample}")
-    SAMPLE=$(echo "$SAMPLE" | cut -d'_' -f1)
-    echo "Processing sample: ${SAMPLE}"
-
-    echo "${bmtagger_out_dir}${SAMPLE}${forward_reads}"
-    echo "${bmtagger_out_dir}${SAMPLE}${reverse_reads}"
-
-    # Run FastQC
-    fastqc -o ${bmtagger_fastqc_dir} -t 20 \
-        ${bmtagger_out_dir}${SAMPLE}${forward_reads} \
-        ${bmtagger_out_dir}${SAMPLE}${reverse_reads}
-done
-
-echo "Running MultiQC..."
-
-bmtagger_multiqc_dir="$(pwd)/output/05_bmtagger_multiqc"
-mkdir -p ${bmtagger_multiqc_dir}
-
-conda activate multiqc
-
-# Run MultiQC
-multiqc -f ${bmtagger_fastqc_dir} -o ${bmtagger_multiqc_dir} -n multiqc_report.html
-
-echo "All samples processed."
-echo "Finished at: `date`"
-```
+###### Script: `05_bmtagger_fastqc_multiqc.sh`
 
 ### How to Run
 
 ```bash
 sbatch scripts/05_bmtagger_fastqc_multiqc.sh
 
-# View results
-firefox output/05_bmtagger_multiqc/multiqc_report.html
+# Check results
+ls output/05_bmtagger_multiqc/multiqc_report.html
 ```
 
 ---
@@ -255,135 +198,26 @@ firefox output/05_bmtagger_multiqc/multiqc_report.html
 ### Purpose
 Classify reads taxonomically and estimate abundance using Kraken2 and Bracken.
 
-### Script: `06_kraken_bracken_5.sh`
-
-```bash
-#!/usr/bin/bash
-
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=48
-#SBATCH --time=7-00:00:00
-#SBATCH --mem=128G
-#SBATCH --output=logs/annotation_sbatch_job.%A.out
-#SBATCH --error=logs/annotation_sbatch_job.%A.err
-
-echo "Starting taxonomic classification..."
-echo "Started at: `date`"
-
-# Initialize conda
-eval "$(conda shell.bash hook)"
-conda activate shotgun2025
-
-# Directory paths
-bmtagger_out_dir="$(pwd)/output/04_bmtagger/"
-Kraken_DIR="$(pwd)/output/06_kraken2"
-Bracken_DIR="$(pwd)/output/06_bracken2"
-
-# Create output directories
-mkdir -p "${Kraken_DIR}" "${Bracken_DIR}"
-
-# Path to Kraken2 database
-DB="/work/vetmed_shared_dbs/kraken2_dbs/kraken2_NCBI_Oct22/"
-
-echo "First Kraken step to produce MPA-style reports..."
-
-# First Kraken2 run - MPA style reports
-for sample in "${bmtagger_out_dir}"/*_bmtagged_1.fastq; do
-    SAMPLE=$(basename "${sample}" "_bmtagged_1.fastq")
-    echo "${SAMPLE}: First alignment"
-
-    R1=${SAMPLE}_bmtagged_1.fastq
-    R2=${SAMPLE}_bmtagged_2.fastq
-
-    # Run Kraken2 with MPA style output
-    kraken2 \
-        --db "${DB}" \
-        --threads 48 \
-        --memory-mapping \
-        --confidence 0.1 \
-        --report "${Kraken_DIR}/${SAMPLE}_mpa.tax" \
-        --paired "${bmtagger_out_dir}/${R1}" "${bmtagger_out_dir}/${R2}" \
-        --output "${Kraken_DIR}/${SAMPLE}.krk2"
-done
-
-echo "Second Kraken step for Bracken compatibility..."
-
-# Second Kraken2 run - standard reports for Bracken
-for sample in "${bmtagger_out_dir}"/*_bmtagged_1.fastq; do
-    SAMPLE=$(basename "${sample}" "_bmtagged_1.fastq")
-
-    R1=${SAMPLE}_bmtagged_1.fastq
-    R2=${SAMPLE}_bmtagged_2.fastq
-
-    echo "[INFO] Processing sample: ${SAMPLE}"
-
-    kraken2 \
-        --db "${DB}" \
-        --threads 48 \
-        --memory-mapping \
-        --confidence 0.1 \
-        --paired "${bmtagger_out_dir}/${R1}" "${bmtagger_out_dir}/${R2}" \
-        --report "${Kraken_DIR}/${SAMPLE}.krk2rpt" \
-        --output "${Kraken_DIR}/${SAMPLE}.krk2"
-
-    echo "[INFO] Finished sample: ${SAMPLE}"
-done
-
-echo "Running Bracken for abundance estimation..."
-
-# Run Bracken on Kraken reports
-for sample in "${Kraken_DIR}"/*krk2rpt; do
-    SAMPLE=$(basename "${sample}")
-    echo "Processing ${SAMPLE}"
-
-    bracken \
-        -d $DB \
-        -i "${Kraken_DIR}/$SAMPLE" \
-        -r 300 \
-        -t 100 \
-        -o "${Bracken_DIR}"/${SAMPLE/.krk2rpt/.bck} \
-        -w "${Bracken_DIR}"/${SAMPLE/.krk2rpt/.bckrpt}
-done
-
-echo "Generating visualization files..."
-
-Kraken_bracken_figures="$(pwd)/output/06_Kr-Br-html_reports"
-mkdir -p "${Kraken_bracken_figures}"
-
-# Convert to Krona format
-for sample in "${Bracken_DIR}"/*bckrpt; do 
-    kreport2krona.py -r $sample -o ${sample/.bckrpt/_krona.txt} --no-intermediate-ranks
-done
-
-# Generate individual Krona plots
-for sample in "${Bracken_DIR}"/*krona.txt; do 
-    ktImportText $sample -o "${Kraken_bracken_figures}"/${sample/txt/html}
-done
-
-# Generate combined Krona plot
-ktImportText "${Bracken_DIR}"/*krona.txt -o "${Kraken_bracken_figures}"/all_krona_plots.html
-
-echo "All samples processed."
-echo "Finished at: `date`"
-```
+###### Script: `06_kraken_bracken_5.sh`
 
 ### How to Run
 
 ```bash
 sbatch scripts/06_kraken_bracken_5.sh
 
-# View Krona plots
-firefox output/06_Kr-Br-html_reports/all_krona_plots.html
+# View Krona plots (final results)
+ls output/06_Kr-Br-html_reports/all_krona_plots.html
 ```
 
 ### Database Requirements
 Requires pre-built Kraken2 database. The script assumes access to a shared database, but you can build your own:
 
-```bash
-# Download and build standard database (requires ~100GB disk space)
-kraken2-build --standard --threads 32 --db kraken2_standard_db
-```
+This is the longest process run in this pipeline. If you want to check progress inspect the log files, as illustrated below.
+
+Figure 3. Log files for the kraken2-bracken run.
+
+![kraken2-bracken log files](images/06_kraken_bracken_logs.png)
+
 
 ---
 
