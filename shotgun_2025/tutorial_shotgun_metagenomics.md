@@ -2,7 +2,7 @@
 
 ## Overview
 
-This tutorial provides a complete, step-by-step guide for analyzing shotgun metagenomics data. The pipeline takes you from raw sequencing reads through quality control, taxonomic classification, functional profiling, and statistical analysis. All commands can be copied and pasted directly into your terminal.
+This tutorial provides a complete, step-by-step guide for analyzing shotgun metagenomics data. The pipeline takes you from raw sequencing reads through quality control, taxonomic classification, functional profiling, and statistical analysis. All commands can be copied and pasted directly into your terminal. When appropriate, clear instructions are given to execute Python or R scritps.
 
 ### What You'll Learn
 - Quality assessment and control of metagenomic reads
@@ -33,7 +33,7 @@ The complete pipeline consists of 14 steps:
 10. **Data Filtering** - Remove low-abundance features
 11. **Taxa Parsing** - Extract taxonomic levels
 12. **Diversity Analysis** - Alpha and beta diversity with R
-13. **Differential Abundance (DESeq2)** - Statistical testing with R
+13. **Differential Abundance Analysis (DESeq2)** - Statistical testing with R
 14. **Statistical Analysis (metagenomeSeq)** - Alternative statistical approach
 
 ---
@@ -46,11 +46,18 @@ First, create the main analysis environment:
 
 ```bash
 # Create environment from YAML file
-conda env create -f shotgun2025.yaml
+mamba env create -f shotgun2025.yaml
 
 # Activate environment
 conda activate shotgun2025
 ```
+NOTE: It is possible that, depending on the configuration of your user in ARC, some software might fail to install during the previous step. If that happens, you can create an additional mamba/conda environment for that app. Let's assume that cutadapt failed to install. Do the following:
+
+```bash
+mamba create -n cutadapt cutadapt
+```
+
+Make sure you activate the environment, ideally right before you call the software.
 
 ### 2. Directory Structure
 
@@ -58,35 +65,16 @@ Set up your working directory:
 
 ```bash
 # Create main project directory
-mkdir -p shotgun_analysis
-cd shotgun_analysis
+mkdir -p shotgun2025
+cd shotgun2025
 
 # Create subdirectories
-mkdir -p {data,scripts,output,logs,dbs}
-mkdir -p output/{01_raw_fastqc,01_raw_multiqc,02_cutadapt,02_cutadaptQC,03_prinseq,04_bmtagger,05_bmtagger_fastqc,05_bmtagger_multiqc,06_kraken2,06_bracken2,06_Kr-Br-html_reports,07_merged_reads,07_humann}
-```
+mkdir -p {data,scripts}
 
-### 3. Required Software Installation
+cp /work/vetmed_shared_dbs/shotgun_workshop_2025/data/*fq ./data
 
-Install required tools in your conda environment:
+cp /work/vetmed_shared_dbs/shotgun_workshop_2025/scripts/* ./scripts/
 
-```bash
-# Activate environment
-conda activate shotgun2025
-
-# Install core tools
-conda install -c conda-forge -c bioconda fastqc=0.12.1
-conda install -c conda-forge -c bioconda cutadapt
-conda install -c conda-forge -c bioconda kraken2
-conda install -c conda-forge -c bioconda bracken
-conda install -c conda-forge -c bioconda humann
-conda install -c conda-forge -c bioconda bmtagger
-
-# Install Python packages
-pip install multiqc
-
-# For R analysis
-conda install -c conda-forge -c bioconda r-base r-essentials
 ```
 
 ---
@@ -98,66 +86,9 @@ Assess the quality of raw sequencing reads to identify potential issues before p
 
 ### Script: `01_raw_fastqc_multiqc.sh`
 
-```bash
-#!/usr/bin/bash
-
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=20
-#SBATCH --time=7-00:00:00
-#SBATCH --mem=4G
-#SBATCH --output=logs/QC_sbatch_job.%A.out
-#SBATCH --error=logs/QC_sbatch_job.%A.err
-
-# Initialize conda
-conda init bash &> /dev/null
-source ~/.bashrc &> /dev/null
-
-echo "Starting FastQC analysis..."
-echo "Started at: `date`"
-
-conda activate shotgun2025
-
-# Define paths
-data_dir="./data/"
-forward_reads="_R1_100K.fq"
-reverse_reads="_R2_100K.fq"
-fastqc_out_dir="$(pwd)/output/01_raw_fastqc"
-
-mkdir -p ${fastqc_out_dir}
-
-# Run FastQC on all samples
-for sample in "${data_dir}"/*"$forward_reads"; do
-    SAMPLE=$(basename "${sample}")
-    SAMPLE=$(echo "$SAMPLE" | cut -d'_' -f1)
-    echo "Processing sample: ${SAMPLE}"
-
-    echo "${data_dir}${SAMPLE}${forward_reads}"
-    echo "${data_dir}${SAMPLE}${reverse_reads}"
-
-    # Run FastQC
-    fastqc -o ${fastqc_out_dir} -t 20 ${data_dir}${SAMPLE}${forward_reads} ${data_dir}${SAMPLE}${reverse_reads}
-done
-
-echo "Running MultiQC to aggregate results..."
-
-multiqc_out_dir="$(pwd)/output/01_raw_multiqc"
-mkdir -p ${multiqc_out_dir}
-
-conda activate multiqc
-
-# Run MultiQC
-multiqc -f ${fastqc_out_dir} -o ${multiqc_out_dir} -n multiqc_report.html
-
-echo "All samples processed."
-echo "Finished at: `date`"
-```
-
 ### How to Run
 
 ```bash
-# Copy script to scripts directory
-cp 01_raw_fastqc_multiqc.sh scripts/
 
 # Submit to SLURM
 sbatch scripts/01_raw_fastqc_multiqc.sh
@@ -166,9 +97,12 @@ sbatch scripts/01_raw_fastqc_multiqc.sh
 squeue -u $USER
 
 # View results
-firefox output/01_raw_multiqc/multiqc_report.html
+ls output/01_raw_fastqc/
+ls output/01_raw_multiqc/
 ```
+[fastqc and multiqc results](images/01_fastqc_multiqc_results.png)
 
+\
 ### Expected Output
 - Individual FastQC reports for each sample
 - Aggregated MultiQC report showing quality metrics across all samples
