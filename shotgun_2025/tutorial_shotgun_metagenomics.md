@@ -108,8 +108,7 @@ ls output/01_raw_multiqc/
 - HTML report viewable in web browser
 
 Figure 1. Typical fastqc and multiqc results files.
-
-![fastqc and multiqc results](images/01_fastqc_multiqc_results.png)
+<img src="images//01_fastqc_multiqc_results.png" alt="fastqc and multiqc results" width="600">
 
 If you don't get the expected results, you can inspect the corresponding log files.
 
