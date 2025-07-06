@@ -302,7 +302,7 @@ Figure 8. Results obtained after postprocessing humann3 results.
 ---
 
 Figure 9. A typical humann3 table of reactions renamed.
-<img src="images/humann3_postprocessing.png" alt="humann3 reactions rename" width="200">
+<img src="images/humann3_postprocessing.png" alt="humann3 reactions rename" width="600">
 
 ## Step 9: Data Merging
 
