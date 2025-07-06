@@ -516,17 +516,17 @@ The script generates multiple files for each taxonomic level and analysis:
 - `alpha_diversity_kingdom_Observed.png`
 - `alpha_diversity_kingdom_Shannon.png`
 - `alpha_diversity_phylum_Observed.png`
-- etc.
+-  etc.
 
 **Beta Diversity Plots**:
 - `pcoa_kingdom_bray_with_stats.png`
 - `pcoa_phylum_jaccard_with_stats.png`
-- etc.
+-  etc.
 
 **Stacked Bar Plots**:
 - `stacked_barplot_phylum_top20.png`
 - `stacked_barplot_genus_top20.png`
-- etc.
+-  etc.
 
 ### Understanding the Output
 
@@ -544,13 +544,12 @@ The script generates multiple files for each taxonomic level and analysis:
 ### Purpose
 Identify significantly different microbial features between experimental groups using DESeq2's robust statistical framework.
 
-### Script: `13_DESeq2_microbiome.R`
+###### Script: `13_DESeq2_microbiome.R`
 
 This script performs:
 - Differential expression analysis adapted for microbiome data
 - Hierarchical clustering and PCoA visualization
 - Volcano plot generation
-- Excel export of results
 
 ### Required R Packages
 
@@ -569,7 +568,7 @@ install.packages(c("ecodist", "RColorBrewer", "pheatmap", "vegan", "ggplot2"))
 
 The script expects two input files:
 
-1. **Count Data**: `inflammation_all_samples_kraken2-counts.tsv`
+1. **Count Data**: `merged_taxonomy_table.tsv`
    - Rows = microbial features (taxa)
    - Columns = samples
    - Values = raw counts
@@ -578,34 +577,18 @@ The script expects two input files:
    - Must contain columns: sample names, group information
    - Tab-separated format
 
-### Create the Metadata File
-
-```bash
-# Create metadata file for the inflammation study
-cat > metadata.txt << 'EOF'
-	group	label
-CA1E	01_Control	CA1E
-CA2E	01_Control	CA2E
-CA3E	01_Control	CA3E
-CA4E	01_Control	CA4E
-CA5E	01_Control	CA5E
-TA1E	02_DSS	TA1E
-TA2E	02_DSS	TA2E
-TA3E	02_DSS	TA3E
-TA4E	02_DSS	TA4E
-TA5E	02_DSS	TA5E
-EOF
-```
-
 ### How to Run
 
-```bash
-# Make sure input files are in the working directory
-ls inflammation_all_samples_kraken2-counts.tsv metadata.txt
+Make sure input files are in the working directory: merged_taxonomy_table.tsv and metadata.txt
 
-# Run DESeq2 analysis
-Rscript scripts/13_DESeq2_microbiome.R
-```
+Make sure you set the corresponing working directory, count and metadata input files as in the following picture.
+
+
+<div align="center">
+  <img src="images/13_setwd_inputFiles.png" alt="Config DESeq2 script" width="600">
+</div>
+
+Run the script 13 simply by pressing CMD+SHIFT+ENTER in Mac, or CTRL+SHIFT+ENTER in Windows.
 
 ### Key Features of the Script
 
@@ -682,7 +665,7 @@ wc -l inflammation_all_samples_kraken2-counts_p0.05_DE_features.tsv
 ### Purpose
 Alternative statistical analysis using metagenomeSeq's zero-inflated Gaussian model, specifically designed for sparse microbiome data.
 
-### Script: `14_metagenomeSeq.R`
+###### Script: `14_metagenomeSeq.R`
 
 This script provides:
 - CSS (Cumulative Sum Scaling) normalization
@@ -699,19 +682,21 @@ if (!require("BiocManager", quietly = TRUE))
 
 BiocManager::install("metagenomeSeq")
 
-# Install other packages
+# Install other packages (no need to do it if done for script 13)
 install.packages(c("tidyverse", "reshape2", "RColorBrewer", "pheatmap", "ggrepel"))
 ```
 
 ### How to Run
 
-```bash
-# Ensure input files are available
-ls inflammation_all_samples_kraken2-counts.tsv metadata.txt
+Make sure input files are in the working directory: merged_taxonomy_table.tsv and metadata.txt
 
-# Run metagenomeSeq analysis
-Rscript scripts/14_metagenomeSeq.R
-```
+Make sure you set the corresponing working directory, count and metadata input files as in the following picture.
+
+<div align="center">
+  <img src="images/14_metagenomeSeq_setwd_inputFiles.png" alt="Config metagenomeSeq script" width="600">
+</div>
+
+Run the script 13 simply by pressing CMD+SHIFT+ENTER in Mac, or CTRL+SHIFT+ENTER in Windows.
 
 ### Key Features of the Script
 
@@ -787,21 +772,6 @@ The script provides four different approaches to handle overlapping points in vo
 | Normalization | Geometric Mean | CSS |
 | Zero Handling | Implicit | Explicit |
 | Best For | RNA-seq adapted | Microbiome-specific |
-
-### Running Both Analyses
-
-```bash
-# Run both statistical approaches for comprehensive analysis
-Rscript scripts/13_DESeq2_microbiome.R
-Rscript scripts/14_metagenomeSeq.R
-
-# Compare results
-echo "DESeq2 significant features:"
-wc -l inflammation_all_samples_kraken2-counts_p0.05_DE_features.tsv
-
-echo "metagenomeSeq results available in:"
-ls differential_abundance_results.csv
-```
 
 ---
 
