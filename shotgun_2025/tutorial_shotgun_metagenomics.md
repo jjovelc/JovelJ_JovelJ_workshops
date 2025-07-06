@@ -108,9 +108,11 @@ ls output/01_raw_multiqc/
 - HTML report viewable in web browser
 
 Figure 1. Typical fastqc and multiqc results files.
-<div style="text-align: center;">
+
+<div align="center">
   <img src="images/01_fastqc_multiqc_results.png" alt="fastqc and multiqc results" width="600">
 </div>
+
 If you don't get the expected results, you can inspect the corresponding log files.
 
 Figure 2. Log files corresponding to the run of fastqc and multiqc.
@@ -354,8 +356,11 @@ Extract specific taxonomic levels from the merged taxonomy table for level-speci
 
 ###### Script: `11_parse_taxa.py`
 
+### How to Run
+
 ```bash
-# Usage with the inflammation dataset
+# Parse your filtered taxonomy table
+python scripts/11_parse_taxa.py merged_taxonomy_table.tsv
 ```
 
 This script will generate separate files for each taxonomic level:
@@ -367,12 +372,25 @@ This script will generate separate files for each taxonomic level:
 - `merged_taxonomy_table_level_6.tsv` (Genus)
 - `merged_taxonomy_table_level_7.tsv` (Species)
 
-### How to Run
+Now let's generate a metadata file that we will need for the next section (posrprocessing of count data).
 
 ```bash
-# Parse your filtered taxonomy table
-python scripts/11_parse_taxa.py merged_taxonomy_table.tsv
+# Create metadata file
+cat > metadata.txt << 'EOF'
+SampleID	group	label
+CA1E	Control	CA1E
+CA2E	Control	CA2E
+CA3E	Control	CA3E
+CA4E	Control	CA4E
+CA5E	Control	CA5E
+TA1E	Treatment	TA1E
+TA2E	Treatment	TA2E
+TA3E	Treatment	TA3E
+TA4E	Treatment	TA4E
+TA5E	Treatment	TA5E
+EOF
 ```
+
 Now it is time to transfer our tables to the local computer. 
 
 ```bash
@@ -380,12 +398,22 @@ mkdir files2transfer
 mv merged_genefamilies_rxn_ren.tsv files2transfer
 mv merged_taxonomy_table.tsv files2transfer
 mv merged_taxonomy_table_level_*.tsv files2transfer
+mv metadata.txt files2transfer
+cp scripts/*R files2transfer
 zip -r files2transfer.zip files2transfer/
 ```
 Now you can transfer `files2transfer.zip` to your local computer.
 
-
 ---
+
+## Now we are in the local computer
+
+After transfering file `files2transfer.zip` to the local computer and decompressing it, you should see the following content.
+
+Figure 10. Content of the local shotgun2025 directory to start postprocessing count data.
+
+<img src="images/local_shotgun2025_dir_GUI.png" alt="Content local dir GUI" width="600">
+<img src="images/local_shotgun2025_dir_terminal.png" alt="Content local dir terminal" width="600">
 
 ## Step 12: Alpha and Beta Diversity Analysis
 
@@ -417,29 +445,6 @@ install.packages(c("tidyverse", "vegan", "RColorBrewer"))
 
 ### How to Run
 
-```bash
-# First, ensure you have the required input file
-# The script expects: inflammation_all_samples_kraken2-counts.tsv
-# This should be your merged and filtered taxonomy count table
-
-# Create metadata file
-cat > metadata.txt << 'EOF'
-SampleID	group	label
-CA1E	Control	CA1E
-CA2E	Control	CA2E
-CA3E	Control	CA3E
-CA4E	Control	CA4E
-CA5E	Control	CA5E
-TA1E	Treatment	TA1E
-TA2E	Treatment	TA2E
-TA3E	Treatment	TA3E
-TA4E	Treatment	TA4E
-TA5E	Treatment	TA5E
-EOF
-
-# Run the R script
-Rscript scripts/12_alpha-beta_diversity_norm.R
-```
 
 ### Key Features of the Script
 
