@@ -358,13 +358,13 @@ Extract specific taxonomic levels from the merged taxonomy table for level-speci
 ```
 
 This script will generate separate files for each taxonomic level:
-- merged_taxonomy_table_level_1.tsv (Kingdom)
-- merged_taxonomy_table_level_2.tsv (Phylum)
-- merged_taxonomy_table_level_3.tsv (Class)
-- merged_taxonomy_table_level_4.tsv (Order)
-- merged_taxonomy_table_level_5.tsv (Family)
-- merged_taxonomy_table_level_6.tsv (Genus)
-- merged_taxonomy_table_level_7.tsv (Species)
+- `merged_taxonomy_table_level_1.tsv` (Kingdom)
+- `merged_taxonomy_table_level_2.tsv` (Phylum)
+- `merged_taxonomy_table_level_3.tsv` (Class)
+- `merged_taxonomy_table_level_4.tsv` (Order)
+- `merged_taxonomy_table_level_5.tsv` (Family)
+- `merged_taxonomy_table_level_6.tsv` (Genus)
+- `merged_taxonomy_table_level_7.tsv` (Species)
 
 ### How to Run
 
@@ -381,7 +381,7 @@ mv merged_taxonomy_table.tsv files2transfer
 mv merged_taxonomy_table_level_*.tsv files2transfer
 zip -r files2transfer.zip files2transfer/
 ```
-Now you can transfer files2transfer.zip to your local computer.
+Now you can transfer `files2transfer.zip` to your local computer.
 
 
 ---
