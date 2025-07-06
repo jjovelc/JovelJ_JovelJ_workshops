@@ -782,7 +782,7 @@ The script provides four different approaches to handle overlapping points in vo
 ```bash
 # 1. Setup environment
 conda activate shotgun2025
-mkdir -p shotgun_analysis/{data,scripts,output,logs}
+mkdir -p shotgun_analysis/{data,scripts}
 cd shotgun_analysis
 
 # 2. Quality control
