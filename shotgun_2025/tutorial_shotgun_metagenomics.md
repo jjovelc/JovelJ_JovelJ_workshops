@@ -302,29 +302,47 @@ Figure 8. Results obtained after postprocessing humann3 results.
 ---
 
 Figure 9. A typical humann3 table of reactions renamed.
-![humann3 reactions rename](images/humann3_postprocessing.png)
+<img src="images/humann3_postprocessing.png" alt="humann3 reactions rename" width="200">
 
 ## Step 9: Data Merging
+
+Kraken2 taxonomic classification tables, as well as postprocessed humann3 tables are generated per sample. However, for postprocessing of that data, it is conveniente to have all samples in a single table. For that purpose, you can use script `09_merge.py`.
 
 ### Purpose
 Combine individual sample results into unified tables for analysis.
 
-###### Script: `09_merge.py`
-
 The merge script is provided and should be used as follows:
 
+### How to Run
+
 ```bash
+# For kraken2 results
 # Navigate to Kraken results directory
 cd output/06_kraken2/
 
 # Merge MPA-style taxonomic profiles
-python ../../scripts/09_merge.py *_mpa.tax > ../../merged_taxonomy_table.tsv
+python ../../scripts/09_merge.py *_mpa.tax | sed 's/_mpa//g'  > ../../merged_taxonomy_table.tsv
 
 # Return to main directory
 cd ../../
-```
 
-### How to Run
+# Inspect results
+head merged_taxonomy_table.tsv
+
+# For humann3 results
+# Navidate to the genefamiles results
+cd output/humann3_geneFamilies/
+
+# Merge *_genefamilies_rxn_ren.tsv tables
+python ../../scripts/09_merge.py *_genefamilies_rxn_ren.tsv | sed 's/_merged_genefamilies_rxn_ren//g' >  ../../merged_genefamilies_rxn_ren.tsv
+
+# Return to main directory
+cd ../../
+
+# Inspect results
+head merged_genefamilies_rxn_ren.tsv
+```
+Now it is time to move to the local computer. Transfer files merged_taxonomy_table.tsv and merged_genefamilies_rxn_ren.tsv to your local computer.
 
 ```bash
 # Make sure you're in the correct directory with results
