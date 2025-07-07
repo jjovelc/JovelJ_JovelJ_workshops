@@ -4,6 +4,16 @@
 
 This tutorial provides a complete, step-by-step guide for analyzing shotgun metagenomics data. The pipeline takes you from raw sequencing reads through quality control, taxonomic classification, functional profiling, and statistical analysis. All commands can be copied and pasted directly into your terminal. When appropriate, clear instructions are given to execute Python or R scritps.
 
+## Description of data used
+
+The dataset used in this tutorial originates from a published study that investigated the metabolic and taxonomic changes in the murine gut microbiome during inflammation. The research was conducted using a well-established mouse model, where acute intestinal inflammation was induced by administering dextran sodium sulfate (DSS) in drinking water. Stool samples were collected from both DSS-treated and control mice at baseline and after seven days to capture the dynamics of the gut microbiome.
+
+To comprehensively profile the microbial communities and their functional potential, the study employed shotgun metagenomics sequencing. This approach enabled the identification of shifts in bacterial taxa, particularly those associated with short-chain fatty acid production and gut homeostasis, as well as changes in the overall microbial gene content. The data generated provides a valuable resource for exploring microbial population dynamics and functional redundancy in the context of gut inflammation.
+
+By leveraging this dataset, the tutorial guides users through practical steps in shotgun metagenomics analysis, using real-world data derived from a controlled experimental setting. This ensures that the analytical methods demonstrated are grounded in biologically relevant scenarios and reflect current research practices in microbiome science.
+
+[See publication](https://pubmed.ncbi.nlm.nih.gov/35185850/)
+
 ### What You'll Learn
 - Quality assessment and control of metagenomic reads
 - Host DNA removal from microbiome samples
