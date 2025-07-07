@@ -12,7 +12,7 @@ To comprehensively profile the microbial communities and their functional potent
 
 By leveraging this dataset, the tutorial guides users through practical steps in shotgun metagenomics analysis, using real-world data derived from a controlled experimental setting. This ensures that the analytical methods demonstrated are grounded in biologically relevant scenarios and reflect current research practices in microbiome science.
 
-[See publication](https://pubmed.ncbi.nlm.nih.gov/35185850/)
+<a href="https://pubmed.ncbi.nlm.nih.gov/35185850/" target="_blank">See publication</a>
 
 ### What You'll Learn
 - Quality assessment and control of metagenomic reads
